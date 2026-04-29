@@ -191,7 +191,7 @@ export function IconSelector({ value, onChange }: IconSelectorProps) {
 
   return (
     <Dialog>
-      <DialogTrigger 
+      <DialogTrigger
         className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-dashed border-muted px-4 py-2 transition-all duration-200 hover:border-primary"
         aria-label={value ? `当前图标：${value}，点击更换` : "选择图标"}
       >

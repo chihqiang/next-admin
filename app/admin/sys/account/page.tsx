@@ -85,32 +85,35 @@ export default function AccountPage() {
   }, [isEdit, currentItem])
 
   // 搜索处理 - 只在点击搜索按钮时触发
-  const handleSearch = (data: Record<string, string>) => {
-    setRequest({
-      page: 1,
-      size: request.size,
-      id: data.id ? Number(data.id) : undefined,
-    })
-  }
+  const handleSearch = useCallback(
+    (data: Record<string, string>) => {
+      setRequest({
+        page: 1,
+        size: request.size,
+        id: data.id ? Number(data.id) : undefined,
+      })
+    },
+    [request.size]
+  )
 
   // 重置处理 - 只在点击重置按钮时触发
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setRequest({
       page: 1,
       size: request.size,
       id: undefined,
     })
-  }
+  }, [request.size])
 
   // 批量删除处理 - 打开确认对话框
-  const handleBatchDelete = (selectedRows: Account[]) => {
+  const handleBatchDelete = useCallback((selectedRows: Account[]) => {
     const ids = selectedRows.map((row) => row.id)
     setBatchDeleteIds(ids)
     setShowBatchDeleteConfirm(true)
-  }
+  }, [])
 
   // 确认批量删除
-  const confirmBatchDelete = async () => {
+  const confirmBatchDelete = useCallback(async () => {
     try {
       await Promise.all(batchDeleteIds.map((id) => accountDeleteApi(id)))
       setShowBatchDeleteConfirm(false)
@@ -119,7 +122,7 @@ export default function AccountPage() {
     } catch (error) {
       console.error("批量删除失败", error)
     }
-  }
+  }, [batchDeleteIds, fetchAccounts])
 
   return (
     <>

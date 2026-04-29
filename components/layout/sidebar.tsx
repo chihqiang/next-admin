@@ -119,6 +119,8 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
                             toggleMenu(item.id.toString())
                           }}
                           className="flex w-full items-center justify-between gap-3"
+                          aria-expanded={menuOpenState[item.id.toString()]}
+                          aria-label={`${menuOpenState[item.id.toString()] ? "折叠" : "展开"}${item.name}菜单`}
                         >
                           <div className="flex items-center gap-3">
                             {item.icon && <Icon name={item.icon} />}

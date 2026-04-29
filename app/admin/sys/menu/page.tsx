@@ -85,21 +85,26 @@ export default function MenuPage() {
     }
   }, [isEdit, currentItem])
 
-  const handleSearch = (data: Record<string, string>) => {
-    setRequest({
-      page: 1,
-      size: request.size,
-      id: data.id ? Number(data.id) : undefined,
-    })
-  }
+  // 搜索处理
+  const handleSearch = useCallback(
+    (data: Record<string, string>) => {
+      setRequest({
+        page: 1,
+        size: request.size,
+        id: data.id ? Number(data.id) : undefined,
+      })
+    },
+    [request.size]
+  )
 
-  const handleReset = () => {
+  // 重置处理
+  const handleReset = useCallback(() => {
     setRequest({
       page: 1,
       size: request.size,
       id: undefined,
     })
-  }
+  }, [request.size])
 
   return (
     <>

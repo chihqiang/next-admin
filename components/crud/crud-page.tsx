@@ -207,6 +207,7 @@ export function CrudPage<T, SearchData = Record<string, unknown>>(
             e.stopPropagation()
             onEdit(item)
           }}
+          aria-label={entityName ? `编辑${entityName}` : "编辑"}
         >
           <Edit className="h-4 w-4" />
         </Button>
@@ -220,6 +221,7 @@ export function CrudPage<T, SearchData = Record<string, unknown>>(
             e.stopPropagation()
             onDelete(item)
           }}
+          aria-label={entityName ? `删除${entityName}` : "删除"}
         >
           <Trash2 className="h-4 w-4" />
         </Button>

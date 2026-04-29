@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Search, Shield, Edit, Trash2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
@@ -86,6 +86,7 @@ export default function RolesPage() {
     }
   }, [isEdit, currentItem])
 
+  // 搜索处理
   const handleSearch = (data: Record<string, string>) => {
     setRequest({
       page: 1,
@@ -94,6 +95,7 @@ export default function RolesPage() {
     })
   }
 
+  // 重置处理
   const handleReset = () => {
     setRequest({
       page: 1,
@@ -201,6 +203,7 @@ export default function RolesPage() {
                 openAuthorize(row)
               }}
               title="授权"
+              aria-label={`为${row.name}角色授权`}
             >
               <Shield className="h-4 w-4" />
             </Button>
@@ -212,6 +215,7 @@ export default function RolesPage() {
                 openEdit(row)
               }}
               title="编辑"
+              aria-label={`编辑${row.name}角色`}
             >
               <Edit className="h-4 w-4" />
             </Button>
@@ -224,6 +228,7 @@ export default function RolesPage() {
                 openDelete(row)
               }}
               title="删除"
+              aria-label={`删除${row.name}角色`}
             >
               <Trash2 className="h-4 w-4" />
             </Button>

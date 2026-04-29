@@ -12,9 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { IconSelector } from "@/components/widgets/ico"
-import { Menu, menuTypeMap, apiMethodMap } from "@/api/menu"
+import { Menu, menuAllApi, menuTypeMap, apiMethodMap } from "@/api/menu"
 import { useEffect, useState } from "react"
-import request from "@/lib/request"
 
 interface MenuFormProps {
   formData: Menu
@@ -25,7 +24,7 @@ export function MenuForm({ formData, onChange }: MenuFormProps) {
   const [menus, setMenus] = useState<Menu[]>([])
 
   useEffect(() => {
-    request.get<Menu[]>("/api/v1/sys/menu/all").then(setMenus)
+    menuAllApi().then(setMenus)
   }, [])
 
   const parentMenus = menus.filter((menu) => menu.menu_type === 1)

@@ -11,6 +11,7 @@ import { ForgotPasswordDialog } from "@/components/login/forgot-password-dialog"
 import { useForm } from "@tanstack/react-form"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
+import { useCallback } from "react"
 
 export function LoginForm({
   className,
@@ -18,20 +19,9 @@ export function LoginForm({
 }: React.ComponentProps<"form">) {
   const router = useRouter()
   const { login, setCurrentAccount } = useAuth()
-  const form = useForm({
-    defaultValues: {
-      email: "",
-      password: "",
-      remember: true,
-    } as LoginRequest,
-    validators: {
-      onSubmit: z.object({
-        email: z.string().min(1, "请输入邮箱"),
-        password: z.string().min(1, "请输入密码"),
-        remember: z.boolean(),
-      }),
-    },
-    onSubmit: async ({ value }) => {
+
+  const handleSubmit = useCallback(
+    async (value: LoginRequest) => {
       try {
         // 登录
         const loginResp = await loginApi(value)
@@ -52,6 +42,25 @@ export function LoginForm({
           description: "发生错误，请稍后重试。",
         })
       }
+    },
+    [login, setCurrentAccount, router]
+  )
+
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+      remember: true,
+    } as LoginRequest,
+    validators: {
+      onSubmit: z.object({
+        email: z.string().min(1, "请输入邮箱"),
+        password: z.string().min(1, "请输入密码"),
+        remember: z.boolean(),
+      }),
+    },
+    onSubmit: async ({ value }) => {
+      await handleSubmit(value)
     },
   })
 
