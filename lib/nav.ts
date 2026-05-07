@@ -1,4 +1,12 @@
-import { LayoutDashboard, UserCog } from "lucide-react"
+import {
+  LayoutDashboard,
+  Menu,
+  ScrollText,
+  ShieldUser,
+  UserCog,
+  Users,
+} from "lucide-react"
+import { getAccount } from "@/lib/account"
 
 export interface Menu {
   key: string
@@ -23,69 +31,86 @@ export const menus: Menu[] = [
       {
         key: "accounts",
         label: "账号列表",
+        icon: Users,
         path: "/admin/sys/account",
       },
       {
         key: "roles",
         label: "角色管理",
+        icon: ShieldUser,
         path: "/admin/sys/roles",
       },
       {
         key: "menus",
         label: "菜单管理",
+        icon: Menu,
         path: "/admin/sys/menu",
       },
       {
         key: "log",
         label: "日志管理",
+        icon: ScrollText,
         path: "/admin/sys/log",
       },
     ],
   },
 ]
 
+// 菜单配置
 /**
- * 从菜单配置自动生成路径到标题的映射
- * 避免手动维护导致的不一致
+ * 递归遍历菜单列表，生成路径到标题的映射
  */
 function generatePathToTitleMap(menuList: Menu[]): Record<string, string> {
   const map: Record<string, string> = {}
-
   const traverse = (items: Menu[]) => {
     items.forEach((item) => {
-      // 如果有path，添加到映射
       if (item.path) {
         map[item.path] = item.label
       }
-      // 递归处理子菜单
       if (item.children) {
         traverse(item.children)
       }
     })
   }
-
   traverse(menuList)
   return map
 }
-
 /**
- * 路径到标题的映射
- * 从menus配置自动生成，包含登录等特殊页面
+ * 获取路径到标题的完整映射（静态配置 + 账户动态菜单）
  */
+export function getAccountMenuPathTitleMap(): Record<string, string> {
+  const accountMap: Record<string, string> = {}
+  type AccountMenu = { path?: string; name: string; children?: AccountMenu[] }
+  const traverseAccountMenus = (items: AccountMenu[]) => {
+    items.forEach((item) => {
+      if (item.path) {
+        accountMap[item.path] = item.name
+      }
+      if (item.children) {
+        traverseAccountMenus(item.children)
+      }
+    })
+  }
+  traverseAccountMenus((getAccount()?.menus ?? []) as AccountMenu[])
+  return {
+    ...pathToTitleMap,
+    ...accountMap,
+  }
+}
+// 静态路径映射（不含动态菜单）
 export const pathToTitleMap: Record<string, string> = {
-  // 特殊页面
   "/login": "登录",
-  // 从菜单配置自动生成
   ...generatePathToTitleMap(menus),
 }
 
-// 可见的菜单项
-export const visibleMenuItems: Menu[] = menus
-
-// 获取页面标题
+// 获取页面标题（自动合并用户菜单）
 export function getPageTitle(pathname: string): string {
+  const map =
+    typeof window !== "undefined"
+      ? getAccountMenuPathTitleMap()
+      : pathToTitleMap
   return (
-    Object.entries(pathToTitleMap)
+    Object.entries(map)
       .filter(([path]) => pathname.startsWith(path))
       .sort((a, b) => b[0].length - a[0].length)
       .at(0)?.[1] ?? "管理后台"

@@ -24,12 +24,12 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar"
 import { useState } from "react"
-import { getPageTitle } from "@/config/menu"
 import { AuthMenuTree } from "@/lib/account"
 import { NavAccount } from "@/components/layout/nav-account"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
 import { Icon } from "@/components/widgets/ico"
+import { getPageTitle } from "@/lib/nav"
 
 export function LayoutSidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()

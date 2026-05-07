@@ -7,11 +7,11 @@ import { AuthProvider } from "@/components/providers/auth-provider"
 import { cn } from "@/lib/utils"
 import { Toaster } from "sonner"
 import { NProgressProvider } from "@/components/providers/nprogress-provider"
-import { getPageTitle } from "@/config/menu"
 import { useEffect } from "react"
 import { usePathname } from "next/navigation"
 
 import "@/mocks"
+import { getPageTitle } from "@/lib/nav"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
