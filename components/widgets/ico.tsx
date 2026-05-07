@@ -1,86 +1,22 @@
-import React, { useState, useRef } from "react"
-import {
-  LayoutDashboard,
-  UserCog,
-  Users,
-  Shield,
-  Menu,
-  ChevronDown,
-  Home,
-  Settings,
-  User,
-  Lock,
-  FileText,
-  BarChart,
-  PieChart,
-  Calendar,
-  Mail,
-  MessageSquare,
-  Bell,
-  Search,
-  Plus,
-  Minus,
-  Edit,
-  Trash,
-  Check,
-  X,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  ArrowDown,
-  RefreshCw,
-  RotateCcw,
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-  Eye,
-  EyeOff,
-  Download,
-  Upload,
-  Share2,
-  Copy,
-  ExternalLink,
-  AlertCircle,
-  Info,
-  HelpCircle,
-  Star,
-  Heart,
-  Bookmark,
-  ThumbsUp,
-  ThumbsDown,
-  Clock,
-  MapPin,
-  Phone,
-  UserPlus,
-  UserMinus,
-  LogOut,
-  LogIn,
-  Unlock,
-  Key,
-  Database,
-  Server,
-  Cloud,
-  Sun,
-  Moon,
-  CloudLightning,
-  CloudRain,
-  Snowflake,
-  Wind,
-  Thermometer,
-  Droplet,
-  Leaf,
-  Mountain,
-} from "lucide-react"
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog"
+import * as icons from "lucide-react"
+import type { LucideIcon } from "lucide-react"
+import Link from "next/link"
+import { useEffect, useRef, useState } from "react"
+import { Input } from "@/components/ui/input"
+import { ExternalLinkIcon } from "lucide-react"
 
 interface IconProps {
   name: string
   className?: string
+}
+
+// ==========================================
+// 图标组件：直接用名字渲染
+// ==========================================
+export function Icon({ name, className = "h-4 w-4" }: IconProps) {
+  const IconComponent = icons[name as keyof typeof icons] as LucideIcon | undefined
+  if (!IconComponent) return null
+  return <IconComponent className={className} />
 }
 
 interface IconSelectorProps {
@@ -88,153 +24,82 @@ interface IconSelectorProps {
   onChange: (value: string) => void
 }
 
-// 图标映射
-const iconMap: Record<string, React.ElementType> = {
-  LayoutDashboard,
-  UserCog,
-  Users,
-  UserRole: Shield,
-  Menu,
-  Home,
-  Settings,
-  User,
-  Lock,
-  FileText,
-  BarChart,
-  PieChart,
-  Calendar,
-  Mail,
-  MessageSquare,
-  Bell,
-  Search,
-  Plus,
-  Minus,
-  Edit,
-  Trash,
-  Check,
-  X,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  ArrowDown,
-  RefreshCw,
-  RotateCcw,
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-  ChevronDown,
-  Eye,
-  EyeOff,
-  Download,
-  Upload,
-  Share2,
-  Copy,
-  ExternalLink,
-  AlertCircle,
-  Info,
-  HelpCircle,
-  Star,
-  Heart,
-  Bookmark,
-  ThumbsUp,
-  ThumbsDown,
-  Clock,
-  MapPin,
-  Phone,
-  UserPlus,
-  UserMinus,
-  LogOut,
-  LogIn,
-  Unlock,
-  Key,
-  Database,
-  Server,
-  Cloud,
-  Sun,
-  Moon,
-  CloudLightning,
-  CloudRain,
-  Snowflake,
-  Wind,
-  Thermometer,
-  Droplet,
-  Leaf,
-  Mountain,
-}
-
-// 根据图标名称获取图标组件
-export const getIconComponent = (
-  iconName: string
-): React.ElementType | null => {
-  return iconMap[iconName] || null
-}
-
-// 图标组件
-export function Icon({ name, className = "h-4 w-4" }: IconProps) {
-  const IconComponent = getIconComponent(name)
-  if (!IconComponent) {
-    return null
-  }
-  return React.createElement(IconComponent, { className })
-}
-
-// 图标选择器组件
+// ==========================================
+// 图标选择器：输入框 + 图标预览
+// ==========================================
 export function IconSelector({ value, onChange }: IconSelectorProps) {
-  const [selectedIcon, setSelectedIcon] = useState(value)
-  const closeRef = useRef<HTMLButtonElement>(null)
+  const [showHelp, setShowHelp] = useState(false)
+  const helpRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLSpanElement>(null)
+  const isEmpty = !value
 
-  const handleIconSelect = (iconKey: string) => {
-    setSelectedIcon(iconKey)
-    onChange(iconKey)
-    closeRef.current?.click()
-  }
+  const IconComponent = value
+    ? (icons[value as keyof typeof icons] as LucideIcon | undefined)
+    : undefined
+
+  // 点击外部关闭
+  useEffect(() => {
+    if (!showHelp) return
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        helpRef.current &&
+        !helpRef.current.contains(e.target as Node) &&
+        triggerRef.current &&
+        !triggerRef.current.contains(e.target as Node)
+      ) {
+        setShowHelp(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [showHelp])
 
   return (
-    <Dialog>
-      <DialogTrigger
-        className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-dashed border-muted px-4 py-2 transition-all duration-200 hover:border-primary"
-        aria-label={value ? `当前图标：${value}，点击更换` : "选择图标"}
-      >
-        {value ? (
-          <div className="flex items-center gap-3">
-            {getIconComponent(value) &&
-              React.createElement(
-                getIconComponent(value) as React.ElementType,
-                {
-                  className: "h-5 w-5 text-primary",
-                }
-              )}
-            <span className="text-sm font-medium">{value}</span>
-          </div>
+    <div className="relative">
+      <div className="flex items-center gap-2">
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="输入图标名称，如 Home、User"
+          className="flex-1"
+        />
+        {IconComponent ? (
+          <IconComponent className="h-5 w-5 text-primary" />
         ) : (
-          <span className="text-sm text-muted-foreground">点击选择图标</span>
+          <span
+            ref={triggerRef}
+            onClick={() => isEmpty && setShowHelp(!showHelp)}
+            className="h-5 w-5 cursor-pointer text-center text-muted-foreground hover:text-foreground"
+          >
+            ?
+          </span>
         )}
-        <ChevronDown className="h-4 w-4 text-muted-foreground" />
-      </DialogTrigger>
-      <DialogContent className="p-4 sm:max-w-md" showCloseButton={false}>
-        <div className="grid grid-cols-6 gap-3">
-          {Object.entries(iconMap).map(([iconKey, IconComponent]) => (
-            <button
-              key={iconKey}
-              type="button"
-              className={`flex flex-col items-center gap-1 rounded-lg p-3 transition-all duration-200 ${
-                selectedIcon === iconKey
-                  ? "scale-105 transform bg-primary text-primary-foreground shadow-md"
-                  : "hover:bg-muted hover:shadow-sm"
-              }`}
-              onClick={() => handleIconSelect(iconKey)}
-              aria-label={`选择${iconKey}图标`}
-              title={iconKey}
-            >
-              <IconComponent className="h-5 w-5" />
-              <span className="w-full truncate text-center text-xs font-medium">
-                {iconKey}
-              </span>
-            </button>
-          ))}
+      </div>
+
+      {showHelp && (
+        <div
+          ref={helpRef}
+          className="absolute left-0 bottom-full z-50 mb-2 w-64 rounded-lg border bg-background p-3 shadow-lg"
+        >
+          <div className="space-y-1">
+            <p className="font-medium">输入 Lucide 图标名称</p>
+            <p className="text-muted-foreground">
+              支持 1500+ 图标，如 Home、User、Settings
+            </p>
+            <div className="flex items-center gap-1">
+              <Link
+                href="https://lucide.dev/icons/"
+                target="_blank"
+              >
+                浏览所有图标
+              </Link>
+              <ExternalLinkIcon className="h-3 w-3 text-primary" />
+            </div>
+          </div>
         </div>
-        <DialogClose ref={closeRef} className="hidden" />
-      </DialogContent>
-    </Dialog>
+      )}
+    </div>
   )
 }
