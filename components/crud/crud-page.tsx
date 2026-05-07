@@ -2,8 +2,8 @@
 
 import { ReactNode, useState, useMemo, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Plus, Edit, Trash2 } from "lucide-react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Edit, Trash2 } from "lucide-react"
 import { CrudPageActions, CrudPageActionsProps } from "./crud-page-actions"
 import {
   DataList,
