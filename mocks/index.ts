@@ -2,8 +2,14 @@ import { setupWorker } from "msw/browser"
 import { accountHandlers } from "@/mocks/handlers/account"
 import { menuHandlers } from "@/mocks/handlers/menu"
 import { roleHandlers } from "@/mocks/handlers/roles"
+import { logHandlers } from "./handlers/log"
 
-const handlers = [...accountHandlers, ...menuHandlers, ...roleHandlers]
+const handlers = [
+  ...accountHandlers,
+  ...menuHandlers,
+  ...roleHandlers,
+  ...logHandlers,
+]
 
 async function startMocking() {
   if (typeof window === "undefined") return

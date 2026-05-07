@@ -14,7 +14,9 @@ interface IconProps {
 // 图标组件：直接用名字渲染
 // ==========================================
 export function Icon({ name, className = "h-4 w-4" }: IconProps) {
-  const IconComponent = icons[name as keyof typeof icons] as LucideIcon | undefined
+  const IconComponent = icons[name as keyof typeof icons] as
+    | LucideIcon
+    | undefined
   if (!IconComponent) return null
   return <IconComponent className={className} />
 }
@@ -81,7 +83,7 @@ export function IconSelector({ value, onChange }: IconSelectorProps) {
       {showHelp && (
         <div
           ref={helpRef}
-          className="absolute left-0 bottom-full z-50 mb-2 w-64 rounded-lg border bg-background p-3 shadow-lg"
+          className="absolute bottom-full left-0 z-50 mb-2 w-64 rounded-lg border bg-background p-3 shadow-lg"
         >
           <div className="space-y-1">
             <p className="font-medium">输入 Lucide 图标名称</p>
@@ -89,10 +91,7 @@ export function IconSelector({ value, onChange }: IconSelectorProps) {
               支持 1500+ 图标，如 Home、User、Settings
             </p>
             <div className="flex items-center gap-1">
-              <Link
-                href="https://lucide.dev/icons/"
-                target="_blank"
-              >
+              <Link href="https://lucide.dev/icons/" target="_blank">
                 浏览所有图标
               </Link>
               <ExternalLinkIcon className="h-3 w-3 text-primary" />

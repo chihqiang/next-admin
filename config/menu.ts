@@ -35,6 +35,11 @@ export const menus: Menu[] = [
         label: "菜单管理",
         path: "/admin/sys/menu",
       },
+      {
+        key: "log",
+        label: "日志管理",
+        path: "/admin/sys/log",
+      },
     ],
   },
 ]
