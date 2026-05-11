@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useState, useMemo, useCallback } from "react"
+import { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Edit, Trash2 } from "lucide-react"
@@ -64,6 +64,8 @@ export interface CrudPageProps<T, SearchData = Record<string, unknown>> {
   onBatchDelete?: (selectedRows: T[]) => void
   /** 批量导出回调 */
   onBatchExport?: (selectedRows: T[]) => void
+  /** 选择变化回调（返回当前选中的行） */
+  onSelectionChange?: (selectedRows: T[]) => void
 
   // ==================== 自定义渲染 ====================
   /** 自定义操作列（可选，默认显示编辑/删除按钮） */
@@ -136,6 +138,7 @@ export function CrudPage<T, SearchData = Record<string, unknown>>(
     onDelete,
     onBatchDelete,
     onBatchExport,
+    onSelectionChange,
 
     // 自定义渲染
     renderActions,
@@ -148,10 +151,29 @@ export function CrudPage<T, SearchData = Record<string, unknown>>(
   // 选择状态管理
   const [selectedRowKeys, setSelectedRowKeys] = useState<Set<string>>(new Set())
 
+  // 使用 ref 存储 onSelectionChange 回调
+  const onSelectionChangeRef = useRef(onSelectionChange)
+  onSelectionChangeRef.current = onSelectionChange
+
   const selectedRows = useMemo(
     () => dataSource.filter((row) => selectedRowKeys.has(rowKey(row))),
     [dataSource, selectedRowKeys, rowKey]
   )
+
+  // 比较两个 Set 是否相等
+  const setsEqual = (a: Set<string>, b: Set<string>) =>
+    a.size === b.size && [...a].every((x) => b.has(x))
+
+  // 记录上次的选中 keys，用于判断是否真正变化
+  const prevSelectedKeysRef = useRef<Set<string> | null>(null)
+
+  // 通知外部选中行变化（仅当选中 keys 实际变化时）
+  useEffect(() => {
+    if (prevSelectedKeysRef.current === null || !setsEqual(prevSelectedKeysRef.current, selectedRowKeys)) {
+      prevSelectedKeysRef.current = selectedRowKeys
+      onSelectionChangeRef.current?.(selectedRows)
+    }
+  }, [selectedRows, selectedRowKeys])
 
   const isAllSelected =
     dataSource.length > 0 && selectedRows.length === dataSource.length

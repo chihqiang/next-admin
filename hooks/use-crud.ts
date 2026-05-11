@@ -18,12 +18,12 @@ type DialogMode = "none" | "add" | "edit" | "delete"
 export interface CrudOptions<T, FormData = T> {
   /** 实体名称（用于提示语，如"账号"、"角色"） */
   entityName?: string
-  /** 新增 API */
-  createApi: (data: FormData) => Promise<unknown>
-  /** 更新 API */
-  updateApi: (data: FormData & { id: number }) => Promise<unknown>
-  /** 删除 API */
-  deleteApi: (id: number) => Promise<unknown>
+  /** 新增 API（不提供则不显示新增按钮） */
+  createApi?: (data: FormData) => Promise<unknown>
+  /** 更新 API（不提供则不显示编辑按钮） */
+  updateApi?: (data: FormData & { id: number }) => Promise<unknown>
+  /** 删除 API（不提供则不显示删除按钮） */
+  deleteApi?: (id: number) => Promise<unknown>
   /** 操作成功后的回调（如刷新列表） */
   onSuccess?: () => void
   /** 自定义新增成功提示语 */
@@ -179,12 +179,14 @@ export function useCrud<T, FormData = T>(
       try {
         setIsLoading(true)
         if (isEdit) {
+          if (!updateApi) throw new Error("不支持更新")
           await updateApi({
             ...data,
             id: (currentItem as unknown as { id: number }).id,
           } as FormData & { id: number })
           toast.success(updateSuccessMessage || `${entityName}更新成功`)
         } else {
+          if (!createApi) throw new Error("不支持新增")
           await createApi(data)
           toast.success(createSuccessMessage || `${entityName}创建成功`)
         }
@@ -213,6 +215,7 @@ export function useCrud<T, FormData = T>(
 
   const handleDelete = useCallback(async () => {
     if (!currentItem) return
+    if (!deleteApi) throw new Error("不支持删除")
     try {
       setIsLoading(true)
       await deleteApi((currentItem as unknown as { id: number }).id)
@@ -254,8 +257,6 @@ export function useCrud<T, FormData = T>(
 
 /**
  * @deprecated 请使用 useCrud
- * 为了兼容旧代码，保留此 Hook
- * 旧接口返回：isAddDialogOpen, isEditDialogOpen, isDeleteDialogOpen, openAddDialog, closeAllDialogs, etc.
  */
 export function useCrudDialog<T, FormData = T>(
   options: CrudOptions<T, FormData>
