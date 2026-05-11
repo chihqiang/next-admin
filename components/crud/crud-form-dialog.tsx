@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 // ==================== 类型定义 ====================
 
@@ -31,6 +32,8 @@ interface CrudFormDialogProps {
   submitText?: string
   /** 表单内容（render prop，接收表单提交函数） */
   children: (handlers: { onSubmit: (data: unknown) => void }) => ReactNode
+  /** 其他 DialogContent 的 props */
+  className?: string
 }
 
 // ==================== 组件实现 ====================
@@ -65,6 +68,7 @@ export function CrudFormDialog(props: CrudFormDialogProps) {
     loading = false,
     submitText,
     children,
+    className,
   } = props
 
   // 计算标题
@@ -85,7 +89,12 @@ export function CrudFormDialog(props: CrudFormDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
+      <DialogContent
+        className={cn(
+          "max-h-[85vh] overflow-y-auto sm:max-w-[600px]",
+          className
+        )}
+      >
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
         </DialogHeader>

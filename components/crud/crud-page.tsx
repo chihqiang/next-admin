@@ -1,6 +1,13 @@
 "use client"
 
-import { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react"
+import {
+  ReactNode,
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Edit, Trash2 } from "lucide-react"
@@ -169,7 +176,10 @@ export function CrudPage<T, SearchData = Record<string, unknown>>(
 
   // 通知外部选中行变化（仅当选中 keys 实际变化时）
   useEffect(() => {
-    if (prevSelectedKeysRef.current === null || !setsEqual(prevSelectedKeysRef.current, selectedRowKeys)) {
+    if (
+      prevSelectedKeysRef.current === null ||
+      !setsEqual(prevSelectedKeysRef.current, selectedRowKeys)
+    ) {
       prevSelectedKeysRef.current = selectedRowKeys
       onSelectionChangeRef.current?.(selectedRows)
     }
