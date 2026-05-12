@@ -48,6 +48,7 @@ interface LSelectProps {
   disabled?: boolean
   className?: string
   multiSelect?: boolean
+  searchable?: boolean // 是否支持搜索
 }
 
 export function LSelect({
@@ -60,6 +61,7 @@ export function LSelect({
   disabled,
   className,
   multiSelect = false,
+  searchable = true,
 }: LSelectProps) {
   const [open, setOpen] = React.useState(false)
   /**
@@ -122,17 +124,21 @@ export function LSelect({
             </Button>
           </PopoverTrigger>
 
-          <PopoverContent className="w-full p-0" align="start">
-            <Command className="rounded-lg border shadow-md">
-              <div className="flex items-center border-b px-3">
-                <CommandInput
-                  placeholder="搜索..."
-                  className="h-10 border-0 focus-visible:ring-0"
-                />
-              </div>
-              <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
-                无结果
-              </CommandEmpty>
+          <PopoverContent className="w-64 p-0" align="start">
+            <Command className="w-full rounded-lg border shadow-md">
+              {searchable && (
+                <>
+                  <div className="flex items-center border-b px-3">
+                    <CommandInput
+                      placeholder="搜索..."
+                      className="h-10 border-0 focus-visible:ring-0"
+                    />
+                  </div>
+                  <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
+                    无结果
+                  </CommandEmpty>
+                </>
+              )}
 
               <CommandGroup className="max-h-60 overflow-y-auto">
                 {options.map((opt) => {
@@ -164,7 +170,84 @@ export function LSelect({
 
   /**
    * ========================
-   * 单选模式（原 Select）
+   * 单选模式 - 支持搜索
+   * ========================
+   */
+  if (searchable) {
+    const selectedOption = options.find(
+      (opt) => String(opt.value) === String(value)
+    )
+
+    return (
+      <div className={cn("space-y-2", className)}>
+        <Label htmlFor={id}>{label}</Label>
+
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger
+            render={<div className="cursor-pointer" />}
+            nativeButton={false}
+          >
+            <Button
+              id={id}
+              disabled={disabled}
+              variant="outline"
+              className="w-full justify-between"
+            >
+              {selectedOption ? (
+                <span>{selectedOption.label}</span>
+              ) : (
+                <span className="text-muted-foreground">{placeholder}</span>
+              )}
+              <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+
+          <PopoverContent className="w-64 p-0" align="start">
+            <Command className="w-full rounded-lg border shadow-md">
+              <div className="flex items-center border-b px-3">
+                <CommandInput
+                  placeholder="搜索..."
+                  className="h-10 border-0 focus-visible:ring-0"
+                />
+              </div>
+              <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
+                无结果
+              </CommandEmpty>
+
+              <CommandGroup className="max-h-60 overflow-y-auto">
+                {options.map((opt) => {
+                  const isSelected = String(opt.value) === String(value)
+
+                  return (
+                    <CommandItem
+                      key={opt.value}
+                      onSelect={() => {
+                        onChange(opt.value)
+                        setOpen(false)
+                      }}
+                      className="flex cursor-pointer items-center gap-3 px-3 py-2.5 transition-colors hover:bg-accent"
+                    >
+                      <Check
+                        className={cn(
+                          "h-4 w-4 shrink-0",
+                          isSelected ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      <span className="flex-1">{opt.label}</span>
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+    )
+  }
+
+  /**
+   * ========================
+   * 单选模式 - 原生 Select
    * ========================
    */
   const normalizeValue = (val?: string | number): string | undefined => {
