@@ -38,20 +38,34 @@ export interface LSelectOption {
   label: string
 }
 
-interface LSelectProps {
+// 单选 Props
+interface LSingleSelectProps {
   id?: string
   label: string
-  value: string | number | (string | number)[]
+  value?: string | number
   options: LSelectOption[]
-  onChange: (value: string | number | (string | number)[]) => void
+  onChange?: (value: string | number | undefined) => void
   placeholder?: string
   disabled?: boolean
   className?: string
-  multiSelect?: boolean
-  searchable?: boolean // 是否支持搜索
+  searchable?: boolean
 }
 
-export function LSelect({
+// 多选 Props
+interface LMultiSelectProps {
+  id?: string
+  label: string
+  value?: (string | number)[]
+  options: LSelectOption[]
+  onChange?: (value: (string | number)[]) => void
+  placeholder?: string
+  disabled?: boolean
+  className?: string
+  searchable?: boolean
+}
+
+// 单选组件
+function LSingleSelect({
   id,
   label,
   value,
@@ -60,47 +74,40 @@ export function LSelect({
   placeholder = "请选择",
   disabled,
   className,
-  multiSelect = false,
   searchable = true,
-}: LSelectProps) {
+}: LSingleSelectProps) {
   const [open, setOpen] = React.useState(false)
-  /**
-   * ========================
-   * 多选模式
-   * ========================
-   */
-  if (multiSelect) {
-    const values = Array.isArray(value) ? value : []
-    const stringValues = values.map((v) => String(v))
-    const toggle = (val: string) => {
-      const exists = stringValues.includes(val)
+  const normalizeValue = (val?: string | number): string => {
+    if (val === undefined || val === null) return ""
+    return String(val)
+  }
+  const denormalizeValue = (val: string): string | number | undefined => {
+    if (val === "") return undefined
+    const option = options.find((opt) => String(opt.value) === val)
+    return option ? option.value : val
+  }
+  const singleValue =
+    typeof value === "string" || typeof value === "number" ? value : undefined
 
-      let newValues: string[]
-      if (exists) {
-        newValues = stringValues.filter((v) => v !== val)
-      } else {
-        newValues = [...stringValues, val]
-      }
-      const result = newValues.map((v) => {
-        const opt = options.find((o) => String(o.value) === v)
-        return opt ? opt.value : v
-      })
-
-      onChange(result)
-    }
-
-    const selectedOptions = options.filter((opt) =>
-      stringValues.includes(String(opt.value))
+  if (searchable) {
+    const selectedOption = options.find(
+      (opt) => String(opt.value) === String(singleValue)
     )
-
     return (
       <div className={cn("space-y-2", className)}>
         <Label htmlFor={id}>{label}</Label>
-
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open} onOpenChange={disabled ? undefined : setOpen}>
           <PopoverTrigger
-            render={<div className="cursor-pointer" />}
+            render={
+              <div
+                className={cn(
+                  "cursor-pointer",
+                  disabled && "pointer-events-none opacity-50"
+                )}
+              />
+            }
             nativeButton={false}
+            disabled={disabled}
           >
             <Button
               id={id}
@@ -108,22 +115,163 @@ export function LSelect({
               variant="outline"
               className="w-full justify-between"
             >
-              <div className="flex flex-wrap gap-1">
-                {selectedOptions.length > 0 ? (
-                  selectedOptions.map((opt) => (
-                    <Badge key={opt.value} variant="secondary">
-                      {opt.label}
-                    </Badge>
-                  ))
-                ) : (
-                  <span className="text-muted-foreground">{placeholder}</span>
-                )}
-              </div>
-
+              {selectedOption ? (
+                <span>{selectedOption.label}</span>
+              ) : (
+                <span className="text-muted-foreground">{placeholder}</span>
+              )}
               <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
             </Button>
           </PopoverTrigger>
+          {!disabled && (
+            <PopoverContent className="w-64 p-0" align="start">
+              <Command className="w-full rounded-lg border shadow-md">
+                <div className="flex items-center border-b px-3">
+                  <CommandInput
+                    placeholder="搜索..."
+                    className="h-10 border-0 focus-visible:ring-0"
+                  />
+                </div>
+                <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
+                  无结果
+                </CommandEmpty>
+                <CommandGroup className="max-h-60 overflow-y-auto">
+                  {options.map((opt) => {
+                    const isSelected = String(opt.value) === String(singleValue)
+                    return (
+                      <CommandItem
+                        key={opt.value}
+                        onSelect={() => {
+                          onChange?.(opt.value)
+                          setOpen(false)
+                        }}
+                        className="flex cursor-pointer items-center gap-3 px-3 py-2.5 transition-colors hover:bg-accent"
+                      >
+                        <Check
+                          className={cn(
+                            "h-4 w-4 shrink-0",
+                            isSelected ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <span className="flex-1">{opt.label}</span>
+                      </CommandItem>
+                    )
+                  })}
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          )}
+        </Popover>
+      </div>
+    )
+  }
+  // 不可搜索时用原生 Select
+  return (
+    <div className={cn("space-y-2", className)}>
+      <Label htmlFor={id}>{label}</Label>
+      <Select
+        disabled={disabled}
+        value={normalizeValue(singleValue)}
+        onValueChange={(val) => {
+          onChange?.(denormalizeValue(val ?? ""))
+        }}
+      >
+        <SelectTrigger id={id}>
+          <SelectValue
+            placeholder={placeholder}
+            {...(options.find(
+              (opt) => normalizeValue(opt.value) === normalizeValue(singleValue)
+            )
+              ? {
+                  children: options.find(
+                    (opt) =>
+                      normalizeValue(opt.value) === normalizeValue(singleValue)
+                  )?.label,
+                }
+              : {})}
+          />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((opt) => (
+            <SelectItem key={opt.value} value={normalizeValue(opt.value)}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  )
+}
 
+// 多选组件
+function LMultiSelect({
+  id,
+  label,
+  value,
+  options,
+  onChange,
+  placeholder = "请选择",
+  disabled,
+  className,
+  searchable = true,
+}: LMultiSelectProps) {
+  const [open, setOpen] = React.useState(false)
+  const values = Array.isArray(value) ? value : []
+  const stringValues = values.map((v) => String(v))
+  const toggle = (val: string) => {
+    const exists = stringValues.includes(val)
+    let newValues: string[]
+    if (exists) {
+      newValues = stringValues.filter((v) => v !== val)
+    } else {
+      newValues = [...stringValues, val]
+    }
+    const result = newValues.map((v) => {
+      const opt = options.find((o) => String(o.value) === v)
+      return opt ? opt.value : v
+    })
+    onChange?.(result)
+  }
+  const selectedOptions = options.filter((opt) =>
+    stringValues.includes(String(opt.value))
+  )
+  return (
+    <div className={cn("space-y-2", className)}>
+      <Label htmlFor={id}>{label}</Label>
+      <Popover open={open} onOpenChange={disabled ? undefined : setOpen}>
+        <PopoverTrigger
+          render={
+            <div
+              className={cn(
+                "cursor-pointer",
+                disabled && "pointer-events-none opacity-50"
+              )}
+            />
+          }
+          nativeButton={false}
+          disabled={disabled}
+        >
+          <Button
+            id={id}
+            disabled={disabled}
+            variant="outline"
+            className="w-full justify-between"
+          >
+            <div className="flex flex-wrap gap-1">
+              {selectedOptions.length > 0 ? (
+                selectedOptions.map((opt) => (
+                  <Badge key={opt.value} variant="secondary">
+                    {opt.label}
+                  </Badge>
+                ))
+              ) : (
+                <span className="text-muted-foreground">{placeholder}</span>
+              )}
+            </div>
+            <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        {!disabled && (
           <PopoverContent className="w-64 p-0" align="start">
             <Command className="w-full rounded-lg border shadow-md">
               {searchable && (
@@ -139,11 +287,9 @@ export function LSelect({
                   </CommandEmpty>
                 </>
               )}
-
               <CommandGroup className="max-h-60 overflow-y-auto">
                 {options.map((opt) => {
                   const checked = stringValues.includes(String(opt.value))
-
                   return (
                     <CommandItem
                       key={opt.value}
@@ -163,128 +309,22 @@ export function LSelect({
               </CommandGroup>
             </Command>
           </PopoverContent>
-        </Popover>
-      </div>
-    )
-  }
-
-  /**
-   * ========================
-   * 单选模式 - 支持搜索
-   * ========================
-   */
-  if (searchable) {
-    const selectedOption = options.find(
-      (opt) => String(opt.value) === String(value)
-    )
-
-    return (
-      <div className={cn("space-y-2", className)}>
-        <Label htmlFor={id}>{label}</Label>
-
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger
-            render={<div className="cursor-pointer" />}
-            nativeButton={false}
-          >
-            <Button
-              id={id}
-              disabled={disabled}
-              variant="outline"
-              className="w-full justify-between"
-            >
-              {selectedOption ? (
-                <span>{selectedOption.label}</span>
-              ) : (
-                <span className="text-muted-foreground">{placeholder}</span>
-              )}
-              <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-
-          <PopoverContent className="w-64 p-0" align="start">
-            <Command className="w-full rounded-lg border shadow-md">
-              <div className="flex items-center border-b px-3">
-                <CommandInput
-                  placeholder="搜索..."
-                  className="h-10 border-0 focus-visible:ring-0"
-                />
-              </div>
-              <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
-                无结果
-              </CommandEmpty>
-
-              <CommandGroup className="max-h-60 overflow-y-auto">
-                {options.map((opt) => {
-                  const isSelected = String(opt.value) === String(value)
-
-                  return (
-                    <CommandItem
-                      key={opt.value}
-                      onSelect={() => {
-                        onChange(opt.value)
-                        setOpen(false)
-                      }}
-                      className="flex cursor-pointer items-center gap-3 px-3 py-2.5 transition-colors hover:bg-accent"
-                    >
-                      <Check
-                        className={cn(
-                          "h-4 w-4 shrink-0",
-                          isSelected ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      <span className="flex-1">{opt.label}</span>
-                    </CommandItem>
-                  )
-                })}
-              </CommandGroup>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      </div>
-    )
-  }
-
-  /**
-   * ========================
-   * 单选模式 - 原生 Select
-   * ========================
-   */
-  const normalizeValue = (val?: string | number): string | undefined => {
-    if (val === undefined || val === null) return undefined
-    return String(val)
-  }
-
-  const denormalizeValue = (val: string): string | number => {
-    const option = options.find((opt) => String(opt.value) === val)
-    return option ? option.value : val
-  }
-
-  return (
-    <div className={cn("space-y-2", className)}>
-      <Label htmlFor={id}>{label}</Label>
-
-      <Select
-        disabled={disabled}
-        value={normalizeValue(value as string | number)}
-        onValueChange={(val) => {
-          onChange(denormalizeValue(val ?? ""))
-        }}
-      >
-        <SelectTrigger id={id}>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-
-        <SelectContent>
-          {options.map((opt) => (
-            <SelectItem key={opt.value} value={String(opt.value)}>
-              {opt.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        )}
+      </Popover>
     </div>
   )
+}
+
+// 统一入口组件
+type LSelectProps =
+  | ({ multiSelect?: false } & LSingleSelectProps)
+  | ({ multiSelect: true } & LMultiSelectProps)
+
+export function LSelect(props: LSelectProps) {
+  if (props.multiSelect) {
+    return <LMultiSelect {...props} />
+  }
+  return <LSingleSelect {...props} />
 }
 
 /**
