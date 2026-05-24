@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { Search, Shield, Edit, Trash2 } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Role,
@@ -113,44 +112,20 @@ export default function RolesPage() {
         createApi={roleCreateApi}
         updateApi={roleUpdateApi}
         detailApi={roleDetailApi}
-        renderActions={(row) => (
-          <div className="flex justify-end gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={(e) => {
-                e.stopPropagation()
-                setAuthorizeRole(row)
-                setIsAuthorizeOpen(true)
-              }}
-              title="授权"
-            >
-              <Shield className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-              title="编辑"
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-destructive"
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-              title="删除"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
+        extraActions={(row) => (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={(e) => {
+              e.stopPropagation()
+              setAuthorizeRole(row)
+              setIsAuthorizeOpen(true)
+            }}
+            title="授权"
+          >
+            <Shield className="h-4 w-4" />
+          </Button>
         )}
       />
 

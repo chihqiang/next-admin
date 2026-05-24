@@ -100,6 +100,8 @@ export interface CrudTableProps<T extends HasId, FormData = T> {
 
   /** 自定义操作列 */
   renderActions?: (item: T) => ReactNode
+  /** 额外操作按钮（在编辑/删除按钮之前显示） */
+  extraActions?: (item: T) => ReactNode
   /** 获取删除确认显示名称 */
   getItemName?: (item: T) => ReactNode
 }
@@ -127,6 +129,7 @@ export function CrudTable<T extends HasId, FormData = T>(
     updateApi,
     detailApi,
     renderActions,
+    extraActions,
     getItemName,
   } = props
 
@@ -343,6 +346,7 @@ export function CrudTable<T extends HasId, FormData = T>(
   const defaultRenderActions = useCallback(
     (item: T) => (
       <div className="flex justify-end gap-1">
+        {extraActions && extraActions(item)}
         {FormComponent && updateApi && createApi && (
           <Button
             variant="ghost"
@@ -371,7 +375,7 @@ export function CrudTable<T extends HasId, FormData = T>(
         )}
       </div>
     ),
-    [FormComponent, updateApi, createApi, deleteApi, openEdit, openDelete]
+    [FormComponent, updateApi, createApi, deleteApi, openEdit, openDelete, extraActions]
   )
 
   // 最终列配置
