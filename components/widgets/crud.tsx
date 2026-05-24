@@ -21,7 +21,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { DataList, DataListColumn, RenderCard } from "@/components/widgets/data-list"
+import {
+  DataList,
+  DataListColumn,
+  RenderCard,
+} from "@/components/widgets/data-list"
 
 // ============================================================================
 // 类型定义
@@ -261,7 +265,12 @@ export function CrudFormDialog<FormData>({
           <Button variant="outline" onClick={onClose} disabled={loading}>
             取消
           </Button>
-          <Button type="submit" form="crud-form" onClick={handleSubmit} disabled={loading}>
+          <Button
+            type="submit"
+            form="crud-form"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
             {loading && (
               <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
             )}
@@ -525,7 +534,9 @@ export function Crud<T extends HasId, FormData = T>(
   const [submitLoading, setSubmitLoading] = useState(false)
 
   // 搜索表单值
-  const [searchFormValues, setSearchFormValues] = useState<Record<string, string>>({})
+  const [searchFormValues, setSearchFormValues] = useState<
+    Record<string, string>
+  >({})
 
   // 数据获取
   const fetchData = useCallback(async () => {
@@ -585,10 +596,10 @@ export function Crud<T extends HasId, FormData = T>(
           const detail = await detailApi(item.id)
           setFormData(detail)
         } catch {
-          setFormData((item as unknown) as FormData)
+          setFormData(item as unknown as FormData)
         }
       } else {
-        setFormData((item as unknown) as FormData)
+        setFormData(item as unknown as FormData)
       }
     },
     [detailApi]
@@ -746,14 +757,20 @@ export function Crud<T extends HasId, FormData = T>(
         )}
       </div>
     ),
-    [FormComponent, updateApi, createApi, deleteApi, openEdit, openDelete, extraActions]
+    [
+      FormComponent,
+      updateApi,
+      createApi,
+      deleteApi,
+      openEdit,
+      openDelete,
+      extraActions,
+    ]
   )
 
   // 最终列配置
   const finalColumns =
-    renderActions ||
-    (FormComponent && updateApi && createApi) ||
-    deleteApi
+    renderActions || (FormComponent && updateApi && createApi) || deleteApi
       ? [
           ...columns,
           {
@@ -784,7 +801,8 @@ export function Crud<T extends HasId, FormData = T>(
 
   // 选择状态
   const isAllSelected = data.length > 0 && selectedKeys.size === data.length
-  const isPartiallySelected = selectedKeys.size > 0 && selectedKeys.size < data.length
+  const isPartiallySelected =
+    selectedKeys.size > 0 && selectedKeys.size < data.length
 
   // 获取删除显示名称
   const getDeleteItemName = (): React.ReactNode => {
