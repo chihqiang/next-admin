@@ -9,7 +9,7 @@ import {
   accountDetailApi,
 } from "@/api/account"
 import { AccountForm } from "@/components/forms/account-form"
-import { CrudTable, SearchField } from "@/components/widgets/crud-table"
+import { Crud, SearchField } from "@/components/widgets/crud"
 import { DataListColumn } from "@/components/widgets/data-list"
 
 const searchFields: SearchField[] = [
@@ -61,7 +61,7 @@ const defaultFormData: AccountCreateUpdate = {
 
 export default function AccountPage() {
   return (
-    <CrudTable<Account, AccountCreateUpdate>
+    <Crud<Account, AccountCreateUpdate>
       title="账号管理"
       entityName="账号"
       columns={columns}

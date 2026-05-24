@@ -9,7 +9,7 @@ import {
   menuDetailApi,
 } from "@/api/menu"
 import { MenuForm } from "@/components/forms/menu-form"
-import { CrudTable, SearchField } from "@/components/widgets/crud-table"
+import { Crud, SearchField } from "@/components/widgets/crud"
 import { DataListColumn } from "@/components/widgets/data-list"
 
 const searchFields: SearchField[] = [
@@ -85,7 +85,7 @@ export default function MenuPage() {
   ]
 
   return (
-    <CrudTable<Menu, Menu>
+    <Crud<Menu, Menu>
       title="菜单管理"
       entityName="菜单"
       columns={columns}

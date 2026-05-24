@@ -1,7 +1,7 @@
 "use client"
 
 import { logListApi, Log } from "@/api/log"
-import { CrudTable, SearchField } from "@/components/widgets/crud-table"
+import { Crud, SearchField } from "@/components/widgets/crud"
 import { DataListColumn } from "@/components/widgets/data-list"
 
 const searchFields: SearchField[] = [
@@ -105,7 +105,7 @@ export default function LogPage() {
   ]
 
   return (
-    <CrudTable<Log>
+    <Crud<Log>
       title="日志管理"
       entityName="日志"
       columns={columns}

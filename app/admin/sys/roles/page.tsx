@@ -15,7 +15,7 @@ import {
 } from "@/api/roles"
 import { RoleForm } from "@/components/forms/role-form"
 import { RoleAuthorizeDialog } from "@/components/forms/role-authorize-form"
-import { CrudTable, SearchField } from "@/components/widgets/crud-table"
+import { Crud, SearchField } from "@/components/widgets/crud"
 import { DataListColumn } from "@/components/widgets/data-list"
 
 const searchFields: SearchField[] = [
@@ -98,7 +98,7 @@ export default function RolesPage() {
 
   return (
     <>
-      <CrudTable<Role, RoleFromRequest>
+      <Crud<Role, RoleFromRequest>
         key={refreshKey}
         title="角色管理"
         entityName="角色"
