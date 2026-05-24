@@ -46,9 +46,6 @@
 │   ├── login/              # 登录相关组件
 │   ├── providers/          # React Context providers
 │   ├── ui/                 # shadcn/ui 组件库
-│   └── widgets/            # 通用小部件
-│       ├── crud.tsx        # 一体化 CRUD 组件（含搜索/表格/弹窗）
-│       └── data-list.tsx   # 数据列表组件
 ├── api/                     # API 接口定义
 ├── lib/                     # 工具库
 │   ├── request.ts          # Axios 封装
