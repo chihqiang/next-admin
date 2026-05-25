@@ -2,8 +2,7 @@ import { http, HttpResponse } from "msw"
 import { roles } from "@/mocks/handlers/data"
 
 export const roleHandlers = [
-  // 获取角色列表
-  http.get("/api/v1/sys/role/list", ({ request }) => {
+  http.get("/api/v1/sys/roles", ({ request }) => {
     const url = new URL(request.url)
     const page = url.searchParams.get("page") || "1"
     const size = url.searchParams.get("size") || "10"
@@ -24,14 +23,11 @@ export const roleHandlers = [
       data: {
         total: filteredRoles.length,
         data: paginatedRoles,
-        page: Number(page),
-        size: Number(size),
       },
     })
   }),
 
-  // 获取所有角色
-  http.get("/api/v1/sys/role/all", () => {
+  http.get("/api/v1/sys/roles/all", () => {
     return HttpResponse.json({
       code: 0,
       msg: "success",
@@ -39,12 +35,12 @@ export const roleHandlers = [
     })
   }),
 
-  // 授权角色菜单
-  http.post("/api/v1/sys/role/associate-menus", async ({ request }) => {
+  http.post("/api/v1/sys/roles/:id/menus", async ({ request, params }) => {
+    const roleId = Number(params.id)
     const body = await request.json()
-    const { id, menu_ids } = body as { id: number; menu_ids: number[] }
+    const { menu_ids } = body as { menu_ids: number[] }
 
-    const role = roles.find((r) => r.id === id)
+    const role = roles.find((r) => r.id === roleId)
     if (role) {
       return HttpResponse.json({
         code: 0,
@@ -55,20 +51,21 @@ export const roleHandlers = [
         },
       })
     } else {
-      return HttpResponse.json({
-        code: 404,
-        msg: "角色不存在",
-        data: null,
-      })
+      return HttpResponse.json(
+        {
+          code: 404,
+          msg: "角色不存在",
+          data: null,
+        },
+        { status: 404 }
+      )
     }
   }),
 
-  // 获取角色详情
-  http.get("/api/v1/sys/role/detail", ({ request }) => {
-    const url = new URL(request.url)
-    const id = Number(url.searchParams.get("id"))
-
+  http.get("/api/v1/sys/roles/:id", ({ params }) => {
+    const id = Number(params.id)
     const role = roles.find((role) => role.id === id)
+
     if (role) {
       return HttpResponse.json({
         code: 0,
@@ -76,16 +73,18 @@ export const roleHandlers = [
         data: role,
       })
     } else {
-      return HttpResponse.json({
-        code: 404,
-        msg: "角色不存在",
-        data: null,
-      })
+      return HttpResponse.json(
+        {
+          code: 404,
+          msg: "角色不存在",
+          data: null,
+        },
+        { status: 404 }
+      )
     }
   }),
 
-  // 创建角色
-  http.post("/api/v1/sys/role/create", async ({ request }) => {
+  http.post("/api/v1/sys/roles", async ({ request }) => {
     const roleData = (await request.json()) as {
       name: string
       sort: number
@@ -104,8 +103,8 @@ export const roleHandlers = [
     })
   }),
 
-  // 更新角色
-  http.put("/api/v1/sys/role/update", async ({ request }) => {
+  http.put("/api/v1/sys/roles/:id", async ({ request, params }) => {
+    const id = Number(params.id)
     const roleData = (await request.json()) as {
       id: number
       name: string
@@ -118,16 +117,17 @@ export const roleHandlers = [
     return HttpResponse.json({
       code: 0,
       msg: "更新成功",
-      data: roleData,
+      data: {
+        ...roleData,
+        id,
+      },
     })
   }),
 
-  // 删除角色
-  http.delete("/api/v1/sys/role/delete", ({ request }) => {
-    const url = new URL(request.url)
-    const id = Number(url.searchParams.get("id"))
-
+  http.delete("/api/v1/sys/roles/:id", ({ params }) => {
+    const id = Number(params.id)
     const role = roles.find((r) => r.id === id)
+
     return HttpResponse.json({
       code: 0,
       msg: "删除成功",

@@ -105,8 +105,44 @@ service.interceptors.response.use(
 
 // ==================== 统一请求方法封装 ====================
 /**
+ * 文件上传配置
+ */
+export interface UploadConfig {
+  /** 自定义请求头 */
+  headers?: Record<string, string>
+  /** 上传进度回调 */
+  onProgress?: (progress: number) => void
+  /** 超时时间（毫秒） */
+  timeout?: number
+}
+
+/**
+ * 单文件上传参数
+ */
+export interface UploadFileParams {
+  /** 文件字段名 */
+  fieldName?: string
+  /** 文件对象 */
+  file: File
+  /** 额外表单字段 */
+  fields?: Record<string, string | number | boolean>
+}
+
+/**
+ * 多文件上传参数
+ */
+export interface UploadFilesParams {
+  /** 文件字段名 */
+  fieldName?: string
+  /** 文件对象数组 */
+  files: File[]
+  /** 额外表单字段 */
+  fields?: Record<string, string | number | boolean>
+}
+
+/**
  * 全局请求工具
- * 封装 GET/POST/PUT/DELETE，自动解包 data.data
+ * 封装 GET/POST/PUT/DELETE/UPLOAD，自动解包 data.data
  * 业务页面直接获取数据，无需重复处理
  */
 const request = {
@@ -164,6 +200,128 @@ const request = {
     return service
       .delete<ApiResponse<T>>(url, config)
       .then((res) => res.data.data)
+  },
+
+  /**
+   * 通用上传方法（使用 FormData）
+   * @param url 请求地址
+   * @param formData FormData 对象
+   * @param config 上传配置
+   * @returns 业务数据
+   */
+  upload<T = unknown>(
+    url: string,
+    formData: FormData,
+    config?: UploadConfig
+  ): Promise<T> {
+    const axiosConfig: AxiosRequestConfig = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        ...config?.headers,
+      },
+      timeout: config?.timeout || 60000,
+    }
+
+    if (config?.onProgress) {
+      axiosConfig.onUploadProgress = (progressEvent) => {
+        if (progressEvent.total) {
+          const progress = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          )
+          config.onProgress!(progress)
+        }
+      }
+    }
+
+    return service
+      .post<ApiResponse<T>>(url, formData, axiosConfig)
+      .then((res) => res.data.data)
+  },
+
+  /**
+   * 单文件上传
+   * @param url 请求地址
+   * @param params 上传参数（文件 + 额外字段）
+   * @param config 上传配置
+   * @returns 业务数据
+   *
+   * @example
+   * ```tsx
+   * const [file, setFile] = useState<File | null>(null)
+   *
+   * const handleUpload = async () => {
+   *   if (!file) return
+   *   const result = await request.uploadFile('/api/v1/upload', {
+   *     file,
+   *     fieldName: 'file',
+   *     fields: { category: 'avatar', description: '用户头像' }
+   *   }, {
+   *     onProgress: (progress) => console.log(`上传进度: ${progress}%`)
+   *   })
+   * }
+   * ```
+   */
+  uploadFile<T = unknown>(
+    url: string,
+    params: UploadFileParams,
+    config?: UploadConfig
+  ): Promise<T> {
+    const formData = new FormData()
+    const fieldName = params.fieldName || "file"
+
+    formData.append(fieldName, params.file)
+
+    if (params.fields) {
+      for (const [key, value] of Object.entries(params.fields)) {
+        formData.append(key, String(value))
+      }
+    }
+
+    return this.upload<T>(url, formData, config)
+  },
+
+  /**
+   * 多文件上传
+   * @param url 请求地址
+   * @param params 上传参数（文件数组 + 额外字段）
+   * @param config 上传配置
+   * @returns 业务数据
+   *
+   * @example
+   * ```tsx
+   * const [files, setFiles] = useState<File[]>([])
+   *
+   * const handleUpload = async () => {
+   *   if (files.length === 0) return
+   *   const result = await request.uploadFiles('/api/v1/upload/batch', {
+   *     files,
+   *     fieldName: 'files',
+   *     fields: { category: 'images' }
+   *   }, {
+   *     onProgress: (progress) => console.log(`上传进度: ${progress}%`)
+   *   })
+   * }
+   * ```
+   */
+  uploadFiles<T = unknown>(
+    url: string,
+    params: UploadFilesParams,
+    config?: UploadConfig
+  ): Promise<T> {
+    const formData = new FormData()
+    const fieldName = params.fieldName || "files"
+
+    params.files.forEach((file) => {
+      formData.append(fieldName, file)
+    })
+
+    if (params.fields) {
+      for (const [key, value] of Object.entries(params.fields)) {
+        formData.append(key, String(value))
+      }
+    }
+
+    return this.upload<T>(url, formData, config)
   },
 }
 
