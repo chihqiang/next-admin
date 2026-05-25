@@ -47,7 +47,7 @@ export interface LogListResponse extends PageResponse<Log> {}
 export async function logListApi(
   data: LogListRequest
 ): Promise<LogListResponse> {
-  return await request.get<LogListResponse>("/api/v1/sys/log/list", {
+  return await request.get<LogListResponse>("/api/v1/sys/logs", {
     params: data,
   })
 }

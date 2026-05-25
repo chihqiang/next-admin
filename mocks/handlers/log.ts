@@ -18,20 +18,18 @@ const mockLogList = Array.from({ length: 50 }, (_, index) => ({
 }))
 
 export const logHandlers = [
-  // 获取日志列表
-  http.get("/api/v1/sys/log/list", async ({ request }) => {
+  http.get("/api/v1/sys/logs", async ({ request }) => {
     await delay(300)
 
     const url = new URL(request.url)
     const page = Number(url.searchParams.get("page")) || 1
-    const page_size = Number(url.searchParams.get("page_size")) || 10
+    const size = Number(url.searchParams.get("size")) || 10
     const request_path = url.searchParams.get("request_path")
     const request_method = url.searchParams.get("request_method")
     const request_ip = url.searchParams.get("request_ip")
 
     let list = [...mockLogList]
 
-    // 过滤
     if (request_path) {
       list = list.filter((item) => item.request_path.includes(request_path))
     }
@@ -42,19 +40,16 @@ export const logHandlers = [
       list = list.filter((item) => item.request_ip?.includes(request_ip))
     }
 
-    // 分页
-    const start = (page - 1) * page_size
-    const end = start + page_size
+    const start = (page - 1) * size
+    const end = start + size
     const data = list.slice(start, end)
 
     return HttpResponse.json({
       code: 0,
-      message: "success",
+      msg: "success",
       data: {
         data,
         total: list.length,
-        page,
-        page_size,
       },
     })
   }),
