@@ -4,8 +4,14 @@ import { ReactNode, useState, useCallback, useEffect } from "react"
 import { Search, Edit, Trash2, Plus } from "lucide-react"
 import { toast } from "sonner"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip"
 import {
   Dialog,
   DialogContent,
@@ -26,18 +32,11 @@ import {
   DataListColumn,
   RenderCard,
 } from "@/components/widgets/data-list"
+import type { PageResponse } from "@/lib/request"
 
 // ============================================================================
 // 类型定义
 // ============================================================================
-
-/**
- * 分页响应接口
- */
-export interface PageResponse<T> {
-  data: T[]
-  total: number
-}
 
 /**
  * 搜索字段配置
@@ -66,8 +65,8 @@ export interface HasId {
  * Crud 组件配置
  */
 export interface CrudProps<T extends HasId, FormData = T> {
-  /** 页面标题 */
-  title: string
+  /** 页面标题（可选，不在内容区显示，仅用于语义） */
+  title?: string
   /** 实体名称 */
   entityName: string
 
@@ -103,6 +102,11 @@ export interface CrudProps<T extends HasId, FormData = T> {
   updateApi?: (data: FormData & { id: number }) => Promise<unknown>
   /** 获取详情 API */
   detailApi?: (id: number) => Promise<FormData>
+
+  /** 弹窗最大宽度 @default "600px" */
+  dialogWidth?: string
+  /** 弹窗最大高度 @default "85vh" */
+  dialogHeight?: string
 
   /** 自定义操作列（完全替换默认操作） */
   renderActions?: (item: T) => ReactNode
@@ -149,17 +153,20 @@ export function CrudSearchForm({
         e.preventDefault()
         onSearch()
       }}
-      className="flex flex-wrap items-end gap-4"
+      className="flex flex-wrap items-center gap-2"
     >
       {fields.map((field) => (
-        <div key={field.name} className="flex items-center gap-2">
+        <div key={field.name} className="flex items-center gap-1.5">
+          <span className="text-sm whitespace-nowrap text-muted-foreground">
+            {field.label}
+          </span>
           {field.type === "select" ? (
             <Select
               value={values[field.name] || ""}
               onValueChange={(value) => onValueChange(field.name, value || "")}
             >
-              <SelectTrigger size="sm" className="w-32">
-                <SelectValue placeholder={field.label} />
+              <SelectTrigger size="sm" className="w-28">
+                <SelectValue placeholder="全部" />
               </SelectTrigger>
               <SelectContent>
                 {field.options?.map((opt) => (
@@ -170,19 +177,19 @@ export function CrudSearchForm({
               </SelectContent>
             </Select>
           ) : (
-            <input
+            <Input
               type="text"
               name={field.name}
               placeholder={field.placeholder || field.label}
               value={values[field.name] || ""}
               onChange={(e) => onValueChange(field.name, e.target.value)}
-              className="h-7 w-40 rounded-md border border-input bg-background px-2 text-sm"
+              className="h-8 w-36"
             />
           )}
         </div>
       ))}
       <Button type="submit" size="sm" disabled={loading}>
-        <Search className="mr-2 h-4 w-4" />
+        <Search className="size-3.5" />
         搜索
       </Button>
       <Button
@@ -224,6 +231,10 @@ interface CrudFormDialogProps<FormData> {
   }>
   /** 是否加载中 */
   loading?: boolean
+  /** 弹窗最大宽度 @default "600px" */
+  dialogWidth?: string
+  /** 弹窗最大高度 @default "85vh" */
+  dialogHeight?: string
 }
 
 /**
@@ -240,6 +251,8 @@ export function CrudFormDialog<FormData>({
   onFormChange,
   formComponent: FormComponent,
   loading = false,
+  dialogWidth = "600px",
+  dialogHeight = "85vh",
 }: CrudFormDialogProps<FormData>) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -248,7 +261,10 @@ export function CrudFormDialog<FormData>({
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[600px]">
+      <DialogContent
+        className="overflow-y-auto"
+        style={{ maxWidth: dialogWidth, maxHeight: dialogHeight }}
+      >
         <DialogHeader>
           <DialogTitle>
             {isEdit ? `编辑${entityName}` : `新增${entityName}`}
@@ -416,8 +432,8 @@ interface CrudActionsBarProps {
 }
 
 /**
- * 操作栏组件
- * 包含新增按钮和批量操作按钮
+ * 操作栏组件（保留导出，内部已内联到工具栏）
+ * @deprecated 已内联到 Crud 工具栏中
  */
 export function CrudActionsBar({
   entityName,
@@ -427,20 +443,15 @@ export function CrudActionsBar({
   selectedCount = 0,
   showBatchDelete = false,
   onBatchDelete,
-  extraActions,
 }: CrudActionsBarProps) {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        {showAdd && onAdd && (
-          <Button onClick={onAdd} size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            新增{entityName}
-          </Button>
-        )}
-        {extraActions}
-      </div>
-
+    <div className="flex flex-wrap items-center gap-2">
+      {showAdd && onAdd && (
+        <Button onClick={onAdd} size="sm">
+          <Plus className="size-3.5" />
+          新增{entityName}
+        </Button>
+      )}
       {selectable && showBatchDelete && onBatchDelete && (
         <Button
           variant="destructive"
@@ -448,7 +459,7 @@ export function CrudActionsBar({
           onClick={onBatchDelete}
           disabled={selectedCount === 0}
         >
-          <Trash2 className="mr-2 h-4 w-4" />
+          <Trash2 className="size-3.5" />
           批量删除 ({selectedCount})
         </Button>
       )}
@@ -514,6 +525,8 @@ export function Crud<T extends HasId, FormData = T>(
     renderActions,
     extraActions,
     getItemName,
+    dialogWidth,
+    dialogHeight,
   } = props
 
   // 数据状态
@@ -730,30 +743,44 @@ export function Crud<T extends HasId, FormData = T>(
       <div className="flex justify-end gap-1">
         {extraActions && extraActions(item)}
         {FormComponent && updateApi && createApi && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={(e) => {
-              e.stopPropagation()
-              openEdit(item)
-            }}
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    openEdit(item)
+                  }}
+                >
+                  <Edit className="size-3.5" />
+                </Button>
+              }
+            />
+            <TooltipContent>编辑</TooltipContent>
+          </Tooltip>
         )}
         {deleteApi && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-destructive"
-            onClick={(e) => {
-              e.stopPropagation()
-              openDelete(item)
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-muted-foreground hover:text-destructive"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    openDelete(item)
+                  }}
+                >
+                  <Trash2 className="size-3.5" />
+                </Button>
+              }
+            />
+            <TooltipContent>删除</TooltipContent>
+          </Tooltip>
         )}
       </div>
     ),
@@ -784,20 +811,32 @@ export function Crud<T extends HasId, FormData = T>(
         ]
       : columns
 
-  // 默认卡片渲染
-  const defaultRenderCard = (item: T) => (
-    <RenderCard
-      entity={item}
-      title={String(item.id)}
-      status={{
-        value: "active",
-        variant: "default",
-        label: entityName,
-      }}
-      {...(FormComponent && updateApi && createApi ? { onEdit: openEdit } : {})}
-      {...(deleteApi ? { onDelete: openDelete } : {})}
-    />
-  )
+  // 默认卡片渲染：从 columns 中提取前几列数据展示
+  const defaultRenderCard = (item: T) => {
+    // 取前 3 列作为卡片信息（排除 actions 列）
+    const infoColumns = columns.slice(0, 3)
+    const meta = (
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        {infoColumns.map((col) => (
+          <span key={col.key}>
+            <span className="text-muted-foreground">{col.header}: </span>
+            {col.cell(item)}
+          </span>
+        ))}
+      </div>
+    )
+    return (
+      <RenderCard
+        entity={item}
+        title={String(item.id)}
+        meta={meta}
+        {...(FormComponent && updateApi && createApi
+          ? { onEdit: openEdit }
+          : {})}
+        {...(deleteApi ? { onDelete: openDelete } : {})}
+      />
+    )
+  }
 
   // 选择状态
   const isAllSelected = data.length > 0 && selectedKeys.size === data.length
@@ -818,60 +857,68 @@ export function Crud<T extends HasId, FormData = T>(
   const hasFormDialog = !!(FormComponent && createApi && updateApi)
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* 搜索表单 */}
-        {searchFields && searchFields.length > 0 && (
-          <div className="mb-4">
-            <CrudSearchForm
-              fields={searchFields}
-              values={searchFormValues}
-              onValueChange={(name, value) =>
-                setSearchFormValues((prev) => ({ ...prev, [name]: value }))
-              }
-              onSearch={handleSearch}
-              onReset={handleReset}
-              loading={loading}
-            />
-          </div>
-        )}
+    <Card className="overflow-hidden">
+      {/* 搜索栏 */}
+      {searchFields && searchFields.length > 0 && (
+        <div className="border-b bg-muted/20 px-4 py-3">
+          <CrudSearchForm
+            fields={searchFields}
+            values={searchFormValues}
+            onValueChange={(name, value) =>
+              setSearchFormValues((prev) => ({ ...prev, [name]: value }))
+            }
+            onSearch={handleSearch}
+            onReset={handleReset}
+            loading={loading}
+          />
+        </div>
+      )}
 
-        {/* 操作栏 */}
-        <CrudActionsBar
-          entityName={entityName}
-          showAdd={hasFormDialog}
-          onAdd={openAdd}
-          selectable={selectable}
-          selectedCount={selectedKeys.size}
-          showBatchDelete={batchDelete}
-          onBatchDelete={handleBatchDelete}
-        />
+      {/* 操作栏 */}
+      {(hasFormDialog || (selectable && batchDelete && deleteApi)) && (
+        <div className="flex items-center gap-2 border-b px-4 py-2.5">
+          {hasFormDialog && (
+            <Button onClick={openAdd} size="sm">
+              <Plus className="size-3.5" />
+              新增{entityName}
+            </Button>
+          )}
+          {selectable && batchDelete && deleteApi && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleBatchDelete}
+              disabled={selectedKeys.size === 0}
+            >
+              <Trash2 className="size-3.5" />
+              批量删除 ({selectedKeys.size})
+            </Button>
+          )}
+        </div>
+      )}
 
-        {/* 数据表格 */}
-        <DataList
-          data={data}
-          columns={finalColumns}
-          renderCard={defaultRenderCard}
-          keyExtractor={(item) => String(item.id)}
-          loading={loading}
-          pagination={{
-            page,
-            pageSize,
-            total,
-            onPageChange: setPage,
-          }}
-          emptyText={`暂无${entityName}数据`}
-          selectable={selectable}
-          selectedRowKeys={selectedKeys}
-          isAllSelected={isAllSelected}
-          isPartiallySelected={isPartiallySelected}
-          onSelectRow={handleSelectRow}
-          onSelectAll={handleSelectAll}
-        />
-      </CardContent>
+      {/* 数据表格区域 - 贴边布局，无嵌套边框 */}
+      <DataList
+        data={data}
+        columns={finalColumns}
+        renderCard={defaultRenderCard}
+        keyExtractor={(item) => String(item.id)}
+        loading={loading}
+        pagination={{
+          page,
+          pageSize,
+          total,
+          onPageChange: setPage,
+        }}
+        emptyText={`暂无${entityName}数据`}
+        selectable={selectable}
+        selectedRowKeys={selectedKeys}
+        isAllSelected={isAllSelected}
+        isPartiallySelected={isPartiallySelected}
+        onSelectRow={handleSelectRow}
+        onSelectAll={handleSelectAll}
+        bordered={false}
+      />
 
       {/* 新增/编辑弹窗 */}
       {hasFormDialog && (
@@ -885,6 +932,8 @@ export function Crud<T extends HasId, FormData = T>(
           onFormChange={setFormData}
           formComponent={FormComponent}
           loading={submitLoading}
+          {...(dialogWidth ? { dialogWidth } : {})}
+          {...(dialogHeight ? { dialogHeight } : {})}
         />
       )}
 
@@ -913,9 +962,5 @@ export function Crud<T extends HasId, FormData = T>(
     </Card>
   )
 }
-
-// 别名：CrudTable 已弃用，使用 Crud
-/** @deprecated 使用 Crud 替代 */
-export const CrudTable = Crud
 
 export default Crud

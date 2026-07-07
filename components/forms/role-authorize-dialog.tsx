@@ -9,8 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Role, Menu } from "@/api/roles"
-import { menuAllApi } from "@/api/menu"
+import { Role, RoleFromRequest } from "@/api/roles"
+import { Menu, menuAllApi } from "@/api/menu"
 import { TreeCheckbox } from "@/components/widgets/tree-checkbox"
 import { buildTree } from "@/lib/utils/tree"
 import { useState, useEffect } from "react"
@@ -54,17 +54,15 @@ export function RoleAuthorizeDialog({
   }, [open])
 
   // 当角色变化时，重置选中的菜单
+  // RoleFromRequest 包含 menus 字段，但传入的 role 可能是 Role 类型（无 menus）
+  // 使用类型守卫安全地获取已授权菜单
   useEffect(() => {
     if (role) {
-      // 假设角色有 menus 字段，或者从其他地方获取已授权的菜单
-      const authorizedMenuIds =
-        (role as any).menus?.map((m: Menu) => m.id) || []
+      const roleWithMenus = role as RoleFromRequest
+      const authorizedMenuIds = roleWithMenus.menus?.map((m) => m.id) || []
       setSelectedMenuIds(authorizedMenuIds)
     }
   }, [role])
-
-  // 构建菜单 ID 到菜单对象的映射，用于快速查找
-  const menuMap = new Map(menus.map((m) => [m.id, m]))
 
   // 将扁平化的菜单数据转换为树形结构
   const treeData = buildTree(menus)
@@ -93,7 +91,7 @@ export function RoleAuthorizeDialog({
         <div className="py-4">
           {isLoadingMenus ? (
             <div className="flex items-center justify-center py-8">
-              <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
+              <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
             </div>
           ) : (
             <TreeCheckbox
@@ -111,11 +109,7 @@ export function RoleAuthorizeDialog({
           >
             取消
           </Button>
-          <Button
-            onClick={handleSubmit}
-            className="bg-blue-600 text-white hover:bg-blue-700"
-            disabled={isLoading || isLoadingMenus}
-          >
+          <Button onClick={handleSubmit} disabled={isLoading || isLoadingMenus}>
             {isLoading ? "授权中..." : "保存授权"}
           </Button>
         </DialogFooter>

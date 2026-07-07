@@ -2,7 +2,7 @@ import { setupWorker } from "msw/browser"
 import { accountHandlers } from "@/mocks/handlers/account"
 import { menuHandlers } from "@/mocks/handlers/menu"
 import { roleHandlers } from "@/mocks/handlers/roles"
-import { logHandlers } from "./handlers/log"
+import { logHandlers } from "@/mocks/handlers/log"
 
 const handlers = [
   ...accountHandlers,

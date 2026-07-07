@@ -1,6 +1,6 @@
 "use client"
 
-import { AuthGuard } from "@/components/layout/auth-grard"
+import { AuthGuard } from "@/components/layout/auth-guard"
 import { LayoutSidebar } from "@/components/layout/sidebar"
 
 export default function AdminLayout({

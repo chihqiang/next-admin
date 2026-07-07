@@ -1,17 +1,7 @@
-"use client"
-
 import { Geist_Mono, Inter } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { AuthProvider } from "@/components/providers/auth-provider"
+import { ClientProviders } from "@/components/providers/client-providers"
 import { cn } from "@/lib/utils"
-import { Toaster } from "sonner"
-import { NProgressProvider } from "@/components/providers/nprogress-provider"
-import { useEffect } from "react"
-import { usePathname } from "next/navigation"
-
-import "@/mocks"
-import { getPageTitle } from "@/lib/nav"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -25,15 +15,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  // 从路径中获取页面标题
-  const pathname = usePathname()
-  useEffect(() => {
-    // 从路径中获取页面标题
-    const pageTitle = getPageTitle(pathname)
-    // 设置文档标题
-    document.title = pageTitle ? `${pageTitle} - 管理后台` : "管理后台"
-  }, [pathname])
-  // 渲染页面
   return (
     <html
       lang="zh-CN"
@@ -46,11 +27,7 @@ export default function RootLayout({
       )}
     >
       <body>
-        <AuthProvider>
-          <ThemeProvider>{children}</ThemeProvider>
-          <Toaster />
-          <NProgressProvider />
-        </AuthProvider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   )

@@ -2,7 +2,7 @@
 
 import { memo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { LayoutDashboard } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 /**
  * 统计卡片组件 - 使用 React.memo 优化避免不必要的重渲染
@@ -23,14 +23,14 @@ const StatCard = memo(function StatCard({
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className={`text-3xl font-bold ${valueClassName}`}>{value}</div>
+        <div className={cn("text-3xl font-bold", valueClassName)}>{value}</div>
         {trend && trendLabel && (
-          <div className={`mt-1 text-sm text-green-600 dark:text-green-400`}>
+          <div className="mt-1 text-sm text-green-600 dark:text-green-400">
             {trend} {trendLabel}
           </div>
         )}
@@ -63,13 +63,16 @@ const ActivityItem = memo(function ActivityItem({
   return (
     <div className="flex items-start space-x-3">
       <div
-        className={`flex h-8 w-8 items-center justify-center rounded-full ${colorClasses[avatarColor]}`}
+        className={cn(
+          "flex h-8 w-8 items-center justify-center rounded-full",
+          colorClasses[avatarColor]
+        )}
       >
         <span className="font-medium">{avatarLetter}</span>
       </div>
       <div>
         <p className="text-sm font-medium">{title}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">{time}</p>
+        <p className="text-xs text-muted-foreground">{time}</p>
       </div>
     </div>
   )
@@ -136,11 +139,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-2">
-        <LayoutDashboard className="h-6 w-6 text-gray-600 dark:text-gray-400" />
-        <h1 className="text-2xl font-bold">控制台</h1>
-      </div>
-
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => (
           <StatCard key={index} {...stat} />

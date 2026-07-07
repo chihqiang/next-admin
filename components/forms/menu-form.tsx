@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { IconSelector } from "@/components/widgets/ico"
+import { IconSelector } from "@/components/widgets/icon"
 import { Menu, menuAllApi, menuTypeMap, apiMethodMap } from "@/api/menu"
 import { useEffect, useState } from "react"
 

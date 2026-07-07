@@ -1,7 +1,10 @@
 import { AuthAccount } from "@/lib/account"
-import request, { sequentialApiCalls } from "@/lib/request"
+import request, {
+  sequentialApiCalls,
+  PageRequest,
+  PageResponse,
+} from "@/lib/request"
 import { AuthToken, setToken } from "@/lib/token"
-import { PageRequest, PageResponse } from "@/lib/types/page"
 
 export interface LoginRequest {
   email: string

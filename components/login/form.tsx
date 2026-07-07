@@ -97,9 +97,11 @@ export function LoginForm({
                 }}
                 placeholder="请输入邮箱"
               />
-              <p className="text-sm text-red-500">
-                {field.state.meta.errors?.[0]?.message}
-              </p>
+              {field.state.meta.errors?.[0]?.message && (
+                <p className="text-sm text-red-500">
+                  {field.state.meta.errors[0].message}
+                </p>
+              )}
             </div>
           )}
         </form.Field>
@@ -124,9 +126,11 @@ export function LoginForm({
                 }}
                 placeholder="请输入密码"
               />
-              <p className="text-sm text-red-500">
-                {field.state.meta.errors?.[0]?.message}
-              </p>
+              {field.state.meta.errors?.[0]?.message && (
+                <p className="text-sm text-red-500">
+                  {field.state.meta.errors[0].message}
+                </p>
+              )}
             </div>
           )}
         </form.Field>

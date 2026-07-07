@@ -77,21 +77,16 @@ function generatePathToTitleMap(menuList: Menu[]): Record<string, string> {
 }
 /**
  * 获取路径到标题的完整映射（静态配置 + 账户动态菜单）
+ * 账户菜单是扁平数组（通过 pid 表示层级），直接遍历即可
  */
 export function getAccountMenuPathTitleMap(): Record<string, string> {
+  const accountMenus = getAccount()?.menus ?? []
   const accountMap: Record<string, string> = {}
-  type AccountMenu = { path?: string; name: string; children?: AccountMenu[] }
-  const traverseAccountMenus = (items: AccountMenu[]) => {
-    items.forEach((item) => {
-      if (item.path) {
-        accountMap[item.path] = item.name
-      }
-      if (item.children) {
-        traverseAccountMenus(item.children)
-      }
-    })
-  }
-  traverseAccountMenus((getAccount()?.menus ?? []) as AccountMenu[])
+  accountMenus.forEach((item) => {
+    if (item.path) {
+      accountMap[item.path] = item.name
+    }
+  })
   return {
     ...pathToTitleMap,
     ...accountMap,

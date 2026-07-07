@@ -3,6 +3,14 @@ import { Menu } from "@/api/menu"
 import { menus } from "@/mocks/handlers/data"
 
 export const menuHandlers = [
+  http.get("/api/v1/sys/menus/all", () => {
+    return HttpResponse.json({
+      code: 0,
+      msg: "success",
+      data: menus,
+    })
+  }),
+
   http.get("/api/v1/sys/menus", ({ request }) => {
     const url = new URL(request.url)
     const page = url.searchParams.get("page") || "1"
@@ -98,14 +106,6 @@ export const menuHandlers = [
         status: true,
         remark: "",
       },
-    })
-  }),
-
-  http.get("/api/v1/sys/menus/all", () => {
-    return HttpResponse.json({
-      code: 0,
-      msg: "success",
-      data: menus,
     })
   }),
 ]

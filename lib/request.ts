@@ -35,6 +35,23 @@ export interface ApiResponse<T = unknown> {
   data: T
 }
 
+/**
+ * 分页请求参数
+ */
+export interface PageRequest {
+  page: number
+  size: number
+}
+
+/**
+ * 分页响应结构
+ * @template T 列表项类型
+ */
+export interface PageResponse<T> {
+  data: T[]
+  total: number
+}
+
 // ==================== 请求拦截器 ====================
 /**
  * 请求发送前统一处理

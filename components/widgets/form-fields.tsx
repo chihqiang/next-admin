@@ -1,4 +1,3 @@
-// @/components/FormSelect.tsx
 import {
   Select,
   SelectContent,

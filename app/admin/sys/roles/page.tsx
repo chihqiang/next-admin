@@ -14,7 +14,7 @@ import {
   roleAssociateMenusApi,
 } from "@/api/roles"
 import { RoleForm } from "@/components/forms/role-form"
-import { RoleAuthorizeDialog } from "@/components/forms/role-authorize-form"
+import { RoleAuthorizeDialog } from "@/components/forms/role-authorize-dialog"
 import { Crud, SearchField } from "@/components/widgets/crud"
 import { DataListColumn } from "@/components/widgets/data-list"
 
