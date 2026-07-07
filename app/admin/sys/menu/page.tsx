@@ -7,6 +7,7 @@ import {
   menuUpdateApi,
   menuDeleteApi,
   menuDetailApi,
+  menuTypeMap,
 } from "@/api/menu"
 import { MenuForm } from "@/components/forms/menu-form"
 import { Crud, SearchField } from "@/components/widgets/crud"
@@ -53,14 +54,7 @@ export default function MenuPage() {
     {
       key: "menu_type",
       header: "类型",
-      cell: (row) => {
-        const typeMap: Record<number, string> = {
-          1: "目录",
-          2: "菜单",
-          3: "按钮",
-        }
-        return typeMap[row.menu_type] || "未知"
-      },
+      cell: (row) => menuTypeMap[row.menu_type] || "未知",
     },
     {
       key: "path",

@@ -521,7 +521,7 @@ export function RenderCard<T>({
               variant="ghost"
               size="icon"
               onClick={() => onDelete(entity)}
-              className="text-red-500 hover:bg-red-50 hover:text-red-700"
+              className="text-destructive hover:text-destructive"
             >
               <Trash2 className="h-4 w-4" />
             </Button>

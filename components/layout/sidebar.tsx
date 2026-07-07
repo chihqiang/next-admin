@@ -30,6 +30,15 @@ import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
 import { Icon } from "@/components/widgets/icon"
 import { getPageTitle } from "@/lib/nav"
+import { cn } from "@/lib/utils"
+
+// 一级菜单项公共样式
+const menuItemClass =
+  "flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left text-sm ring-sidebar-ring outline-hidden transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground"
+
+// 子菜单项公共样式
+const subMenuItemClass =
+  "flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sm text-sidebar-foreground ring-sidebar-ring outline-hidden group-data-[collapsible=icon]:hidden hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground"
 
 export function LayoutSidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -100,13 +109,17 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
                       item.path ? (
                         <Link
                           href={item.path}
-                          className={`flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left text-sm ring-sidebar-ring outline-hidden transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground ${pathname === item.path ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground" : ""}`}
+                          className={cn(
+                            menuItemClass,
+                            pathname === item.path &&
+                              "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                          )}
                         >
                           {item.icon && <Icon name={item.icon} />}
                           <span>{item.name}</span>
                         </Link>
                       ) : (
-                        <div className="flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left text-sm ring-sidebar-ring outline-hidden transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground">
+                        <div className={menuItemClass}>
                           {item.icon && <Icon name={item.icon} />}
                           <span>{item.name}</span>
                         </div>
@@ -139,7 +152,11 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
                                 {subItem.path ? (
                                   <Link
                                     href={subItem.path}
-                                    className={`flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sm text-sidebar-foreground ring-sidebar-ring outline-hidden group-data-[collapsible=icon]:hidden hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground ${pathname.startsWith(subItem.path || "") ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}`}
+                                    className={cn(
+                                      subMenuItemClass,
+                                      pathname.startsWith(subItem.path || "") &&
+                                        "bg-sidebar-accent text-sidebar-accent-foreground"
+                                    )}
                                   >
                                     {subItem.icon && (
                                       <Icon name={subItem.icon} />
@@ -147,7 +164,7 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
                                     {subItem.name}
                                   </Link>
                                 ) : (
-                                  <div className="flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sm text-sidebar-foreground ring-sidebar-ring outline-hidden group-data-[collapsible=icon]:hidden hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground">
+                                  <div className={subMenuItemClass}>
                                     {subItem.icon && (
                                       <Icon name={subItem.icon} />
                                     )}

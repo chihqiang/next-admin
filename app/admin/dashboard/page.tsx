@@ -3,6 +3,7 @@
 import { memo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LayoutDashboard } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 /**
  * 统计卡片组件 - 使用 React.memo 优化避免不必要的重渲染
@@ -28,7 +29,7 @@ const StatCard = memo(function StatCard({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className={`text-3xl font-bold ${valueClassName}`}>{value}</div>
+        <div className={cn("text-3xl font-bold", valueClassName)}>{value}</div>
         {trend && trendLabel && (
           <div className="mt-1 text-sm text-green-600 dark:text-green-400">
             {trend} {trendLabel}
@@ -63,7 +64,10 @@ const ActivityItem = memo(function ActivityItem({
   return (
     <div className="flex items-start space-x-3">
       <div
-        className={`flex h-8 w-8 items-center justify-center rounded-full ${colorClasses[avatarColor]}`}
+        className={cn(
+          "flex h-8 w-8 items-center justify-center rounded-full",
+          colorClasses[avatarColor]
+        )}
       >
         <span className="font-medium">{avatarLetter}</span>
       </div>

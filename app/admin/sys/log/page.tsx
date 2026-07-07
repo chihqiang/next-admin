@@ -3,6 +3,7 @@
 import { logListApi, Log } from "@/api/log"
 import { Crud, SearchField } from "@/components/widgets/crud"
 import { DataListColumn } from "@/components/widgets/data-list"
+import { cn } from "@/lib/utils"
 
 const searchFields: SearchField[] = [
   {
@@ -31,15 +32,15 @@ const searchFields: SearchField[] = [
 ]
 
 export default function LogPage() {
-  // 请求方法颜色映射
+  // 请求方法颜色映射（支持暗黑模式）
   const methodColor = (method: string) => {
     const colorMap: Record<string, string> = {
-      GET: "text-green-600 bg-green-50",
-      POST: "text-blue-600 bg-blue-50",
-      PUT: "text-orange-600 bg-orange-50",
-      DELETE: "text-red-600 bg-red-50",
+      GET: "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950",
+      POST: "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950",
+      PUT: "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950",
+      DELETE: "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950",
     }
-    return colorMap[method] || "text-gray-600 bg-gray-50"
+    return colorMap[method] || "text-muted-foreground bg-muted"
   }
 
   const columns: DataListColumn<Log>[] = [
@@ -59,9 +60,10 @@ export default function LogPage() {
       header: "方法",
       cell: (row) => (
         <span
-          className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${methodColor(
-            row.request_method
-          )}`}
+          className={cn(
+            "inline-flex items-center rounded px-2 py-0.5 text-xs font-medium",
+            methodColor(row.request_method)
+          )}
         >
           {row.request_method}
         </span>
@@ -82,11 +84,11 @@ export default function LogPage() {
       header: "状态码",
       cell: (row) => (
         <span
-          className={
+          className={cn(
             row.response_code >= 200 && row.response_code < 300
-              ? "text-green-600"
-              : "text-red-600"
-          }
+              ? "text-green-600 dark:text-green-400"
+              : "text-red-600 dark:text-red-400"
+          )}
         >
           {row.response_code}
         </span>

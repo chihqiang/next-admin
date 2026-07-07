@@ -91,7 +91,7 @@ export function RoleAuthorizeDialog({
         <div className="py-4">
           {isLoadingMenus ? (
             <div className="flex items-center justify-center py-8">
-              <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
+              <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
             </div>
           ) : (
             <TreeCheckbox
@@ -111,7 +111,6 @@ export function RoleAuthorizeDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            className="bg-blue-600 text-white hover:bg-blue-700"
             disabled={isLoading || isLoadingMenus}
           >
             {isLoading ? "授权中..." : "保存授权"}
