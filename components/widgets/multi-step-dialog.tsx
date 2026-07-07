@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { ChevronLeft } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -121,6 +122,18 @@ export function MultiStepDialog({
           <DialogHeader>
             <DialogTitle>{step.title}</DialogTitle>
             <DialogDescription>{step.description}</DialogDescription>
+            {/* 步骤进度指示器 */}
+            <div className="flex items-center gap-1.5 pt-1">
+              {steps.map((s, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "h-1.5 flex-1 rounded-full transition-colors",
+                    i <= currentStep ? "bg-primary" : "bg-muted"
+                  )}
+                />
+              ))}
+            </div>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
@@ -145,9 +158,25 @@ export function MultiStepDialog({
           </div>
 
           <DialogFooter>
-            <Button onClick={handleNext} disabled={isLoading}>
-              {isLoading ? "处理中..." : step.actionText}
-            </Button>
+            <div className="flex w-full gap-2">
+              {currentStep > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentStep((prev) => prev - 1)}
+                  disabled={isLoading}
+                >
+                  <ChevronLeft className="mr-1 h-4 w-4" />
+                  上一步
+                </Button>
+              )}
+              <Button
+                onClick={handleNext}
+                disabled={isLoading}
+                className="flex-1"
+              >
+                {isLoading ? "处理中..." : step.actionText}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

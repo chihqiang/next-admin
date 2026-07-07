@@ -284,13 +284,13 @@ function TreeCheckbox({
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {searchable && (
           <Input
             placeholder="搜索节点名称..."
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="flex-1"
+            className="min-w-0 flex-1"
           />
         )}
         <Button size="sm" variant="outline" onClick={handleExpandAll}>

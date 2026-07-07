@@ -76,8 +76,8 @@ interface DataListProps<T> {
   data: T[]
   /** 表格列配置 */
   columns: DataListColumn<T>[]
-  /** 移动端卡片渲染方法 */
-  renderCard: (row: T) => React.ReactNode
+  /** 移动端卡片渲染方法（不传则使用默认卡片，自动从 columns 渲染数据） */
+  renderCard?: (row: T) => React.ReactNode
   /** 获取行唯一 key */
   keyExtractor: (row: T) => string
   /** 是否加载中 */
@@ -248,6 +248,37 @@ function DataListPaginationBar({
  * 移动端：Card 布局
  * 支持：加载、空状态、分页、自定义列
  */
+/**
+ * 默认移动端卡片：自动从 columns 配置渲染数据
+ * 无需使用者传入 renderCard 即可自动生成移动端卡片视图
+ */
+function DefaultCard<T>({
+  row,
+  columns,
+}: {
+  row: T
+  columns: DataListColumn<T>[]
+}) {
+  // 过滤掉操作列，避免在卡片数据展示中渲染按钮
+  const dataColumns = columns.filter((col) => col.key !== "actions")
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <dl className="grid grid-cols-1 gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
+          {dataColumns.map((col) => (
+            <div key={col.key} className="flex items-start gap-2">
+              <dt className="shrink-0 font-medium text-muted-foreground">
+                {col.header}:
+              </dt>
+              <dd className="min-w-0 flex-1 break-words">{col.cell(row)}</dd>
+            </div>
+          ))}
+        </dl>
+      </CardContent>
+    </Card>
+  )
+}
+
 export function DataList<T>({
   data,
   columns,
@@ -269,6 +300,31 @@ export function DataList<T>({
 
   const checkboxColSpan = selectable ? 1 : 0
   const totalColumns = columns.length + checkboxColSpan
+
+  // 渲染单张卡片（含选择框）
+  const renderMobileCard = (row: T) => {
+    const key = keyExtractor(row)
+    const isSelected = selectedRowKeys.has(key)
+    const cardContent = renderCard ? (
+      renderCard(row)
+    ) : (
+      <DefaultCard row={row} columns={columns} />
+    )
+
+    if (!selectable) return cardContent
+
+    return (
+      <div className="flex items-start gap-3">
+        <div className="pt-4 pl-3">
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={(checked) => onSelectRow?.(key, !!checked)}
+          />
+        </div>
+        <div className="min-w-0 flex-1">{cardContent}</div>
+      </div>
+    )
+  }
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -358,6 +414,22 @@ export function DataList<T>({
       {/* ==================== 移动端：卡片视图 ==================== */}
       {isMobile && (
         <div className="space-y-3">
+          {/* 全选栏（可选择时显示） */}
+          {selectable && !loading && !isEmpty && (
+            <div className="flex items-center gap-2 px-1">
+              <Checkbox
+                checked={isAllSelected}
+                {...(isPartiallySelected
+                  ? { "data-state": "indeterminate" as const }
+                  : {})}
+                onCheckedChange={(checked) => onSelectAll?.(!!checked)}
+              />
+              <span className="text-sm text-muted-foreground">
+                全选 ({selectedRowKeys.size}/{data.length})
+              </span>
+            </div>
+          )}
+
           {/* 加载中 */}
           {loading && (
             <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
@@ -376,7 +448,7 @@ export function DataList<T>({
           {!loading &&
             !isEmpty &&
             data.map((row) => (
-              <div key={keyExtractor(row)}>{renderCard(row)}</div>
+              <div key={keyExtractor(row)}>{renderMobileCard(row)}</div>
             ))}
         </div>
       )}
@@ -396,7 +468,7 @@ export interface RenderCardProps<T> {
   entity: T
   title: string
   subtitle?: string | React.ReactNode
-  status: {
+  status?: {
     value: string
     variant: "default" | "destructive" | "secondary" | "outline"
     label: string
@@ -430,7 +502,7 @@ export function RenderCard<T>({
             {icon}
             <span>{title}</span>
           </div>
-          <Badge variant={status.variant}>{status.label}</Badge>
+          {status && <Badge variant={status.variant}>{status.label}</Badge>}
         </CardTitle>
         {subtitle && <CardDescription>{subtitle}</CardDescription>}
       </CardHeader>

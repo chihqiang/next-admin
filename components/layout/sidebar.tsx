@@ -28,7 +28,7 @@ import { AuthMenuTree } from "@/lib/account"
 import { NavAccount } from "@/components/layout/nav-account"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
-import { Icon } from "@/components/widgets/ico"
+import { Icon } from "@/components/widgets/icon"
 import { getPageTitle } from "@/lib/nav"
 
 export function LayoutSidebar({ children }: { children: React.ReactNode }) {
@@ -174,7 +174,24 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
       <SidebarInset className="min-w-0 overflow-hidden">
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
-          <h1 className="font-semibold">{getPageTitle(pathname)}</h1>
+          <h1 className="flex-1 truncate font-semibold">
+            {getPageTitle(pathname)}
+          </h1>
+          {/* 移动端主题切换：侧边栏在移动端隐藏时仍可切换主题 */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            title={theme === "dark" ? "切换到亮色模式" : "切换到暗色模式"}
+          >
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+            <span className="sr-only">切换主题</span>
+          </Button>
         </header>
         <div className="min-w-0 flex-1 overflow-y-auto p-4">{children}</div>
       </SidebarInset>

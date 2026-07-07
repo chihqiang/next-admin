@@ -23,14 +23,14 @@ const StatCard = memo(function StatCard({
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className={`text-3xl font-bold ${valueClassName}`}>{value}</div>
         {trend && trendLabel && (
-          <div className={`mt-1 text-sm text-green-600 dark:text-green-400`}>
+          <div className="mt-1 text-sm text-green-600 dark:text-green-400">
             {trend} {trendLabel}
           </div>
         )}
@@ -69,7 +69,7 @@ const ActivityItem = memo(function ActivityItem({
       </div>
       <div>
         <p className="text-sm font-medium">{title}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">{time}</p>
+        <p className="text-xs text-muted-foreground">{time}</p>
       </div>
     </div>
   )
@@ -137,7 +137,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2">
-        <LayoutDashboard className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+        <LayoutDashboard className="h-6 w-6 text-muted-foreground" />
         <h1 className="text-2xl font-bold">控制台</h1>
       </div>
 

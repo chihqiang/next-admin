@@ -149,7 +149,7 @@ export function CrudSearchForm({
         e.preventDefault()
         onSearch()
       }}
-      className="flex flex-wrap items-end gap-4"
+      className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end"
     >
       {fields.map((field) => (
         <div key={field.name} className="flex items-center gap-2">
@@ -158,7 +158,7 @@ export function CrudSearchForm({
               value={values[field.name] || ""}
               onValueChange={(value) => onValueChange(field.name, value || "")}
             >
-              <SelectTrigger size="sm" className="w-32">
+              <SelectTrigger size="sm" className="w-full sm:w-32">
                 <SelectValue placeholder={field.label} />
               </SelectTrigger>
               <SelectContent>
@@ -176,24 +176,26 @@ export function CrudSearchForm({
               placeholder={field.placeholder || field.label}
               value={values[field.name] || ""}
               onChange={(e) => onValueChange(field.name, e.target.value)}
-              className="h-7 w-40 rounded-md border border-input bg-background px-2 text-sm"
+              className="h-7 w-full rounded-md border border-input bg-background px-2 text-sm sm:w-40"
             />
           )}
         </div>
       ))}
-      <Button type="submit" size="sm" disabled={loading}>
-        <Search className="mr-2 h-4 w-4" />
-        搜索
-      </Button>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={onReset}
-        disabled={loading}
-      >
-        重置
-      </Button>
+      <div className="col-span-2 flex gap-2 sm:col-span-1">
+        <Button type="submit" size="sm" disabled={loading}>
+          <Search className="mr-2 h-4 w-4" />
+          搜索
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onReset}
+          disabled={loading}
+        >
+          重置
+        </Button>
+      </div>
     </form>
   )
 }
@@ -430,8 +432,8 @@ export function CrudActionsBar({
   extraActions,
 }: CrudActionsBarProps) {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-wrap items-center gap-2">
         {showAdd && onAdd && (
           <Button onClick={onAdd} size="sm">
             <Plus className="mr-2 h-4 w-4" />
@@ -784,20 +786,32 @@ export function Crud<T extends HasId, FormData = T>(
         ]
       : columns
 
-  // 默认卡片渲染
-  const defaultRenderCard = (item: T) => (
-    <RenderCard
-      entity={item}
-      title={String(item.id)}
-      status={{
-        value: "active",
-        variant: "default",
-        label: entityName,
-      }}
-      {...(FormComponent && updateApi && createApi ? { onEdit: openEdit } : {})}
-      {...(deleteApi ? { onDelete: openDelete } : {})}
-    />
-  )
+  // 默认卡片渲染：从 columns 中提取前几列数据展示
+  const defaultRenderCard = (item: T) => {
+    // 取前 3 列作为卡片信息（排除 actions 列）
+    const infoColumns = columns.slice(0, 3)
+    const meta = (
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        {infoColumns.map((col) => (
+          <span key={col.key}>
+            <span className="text-muted-foreground">{col.header}: </span>
+            {col.cell(item)}
+          </span>
+        ))}
+      </div>
+    )
+    return (
+      <RenderCard
+        entity={item}
+        title={String(item.id)}
+        meta={meta}
+        {...(FormComponent && updateApi && createApi
+          ? { onEdit: openEdit }
+          : {})}
+        {...(deleteApi ? { onDelete: openDelete } : {})}
+      />
+    )
+  }
 
   // 选择状态
   const isAllSelected = data.length > 0 && selectedKeys.size === data.length
