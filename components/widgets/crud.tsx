@@ -8,6 +8,11 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip"
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -148,17 +153,20 @@ export function CrudSearchForm({
         e.preventDefault()
         onSearch()
       }}
-      className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center"
+      className="flex flex-wrap items-center gap-2"
     >
       {fields.map((field) => (
         <div key={field.name} className="flex items-center gap-1.5">
+          <span className="text-sm whitespace-nowrap text-muted-foreground">
+            {field.label}
+          </span>
           {field.type === "select" ? (
             <Select
               value={values[field.name] || ""}
               onValueChange={(value) => onValueChange(field.name, value || "")}
             >
-              <SelectTrigger size="sm" className="w-full sm:w-36">
-                <SelectValue placeholder={field.label} />
+              <SelectTrigger size="sm" className="w-28">
+                <SelectValue placeholder="全部" />
               </SelectTrigger>
               <SelectContent>
                 {field.options?.map((opt) => (
@@ -175,26 +183,24 @@ export function CrudSearchForm({
               placeholder={field.placeholder || field.label}
               value={values[field.name] || ""}
               onChange={(e) => onValueChange(field.name, e.target.value)}
-              className="h-8 w-full sm:w-44"
+              className="h-8 w-36"
             />
           )}
         </div>
       ))}
-      <div className="flex gap-2">
-        <Button type="submit" size="sm" disabled={loading}>
-          <Search className="mr-1.5 h-4 w-4" />
-          搜索
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={onReset}
-          disabled={loading}
-        >
-          重置
-        </Button>
-      </div>
+      <Button type="submit" size="sm" disabled={loading}>
+        <Search className="size-3.5" />
+        搜索
+      </Button>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={onReset}
+        disabled={loading}
+      >
+        重置
+      </Button>
     </form>
   )
 }
@@ -426,8 +432,8 @@ interface CrudActionsBarProps {
 }
 
 /**
- * 操作栏组件
- * 包含新增按钮和批量操作按钮
+ * 操作栏组件（保留导出，内部已内联到工具栏）
+ * @deprecated 已内联到 Crud 工具栏中
  */
 export function CrudActionsBar({
   entityName,
@@ -437,20 +443,15 @@ export function CrudActionsBar({
   selectedCount = 0,
   showBatchDelete = false,
   onBatchDelete,
-  extraActions,
 }: CrudActionsBarProps) {
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex flex-wrap items-center gap-2">
-        {showAdd && onAdd && (
-          <Button onClick={onAdd} size="sm">
-            <Plus className="mr-1.5 h-4 w-4" />
-            新增{entityName}
-          </Button>
-        )}
-        {extraActions}
-      </div>
-
+    <div className="flex flex-wrap items-center gap-2">
+      {showAdd && onAdd && (
+        <Button onClick={onAdd} size="sm">
+          <Plus className="size-3.5" />
+          新增{entityName}
+        </Button>
+      )}
       {selectable && showBatchDelete && onBatchDelete && (
         <Button
           variant="destructive"
@@ -458,7 +459,7 @@ export function CrudActionsBar({
           onClick={onBatchDelete}
           disabled={selectedCount === 0}
         >
-          <Trash2 className="mr-1.5 h-4 w-4" />
+          <Trash2 className="size-3.5" />
           批量删除 ({selectedCount})
         </Button>
       )}
@@ -742,30 +743,44 @@ export function Crud<T extends HasId, FormData = T>(
       <div className="flex justify-end gap-1">
         {extraActions && extraActions(item)}
         {FormComponent && updateApi && createApi && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={(e) => {
-              e.stopPropagation()
-              openEdit(item)
-            }}
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    openEdit(item)
+                  }}
+                >
+                  <Edit className="size-3.5" />
+                </Button>
+              }
+            />
+            <TooltipContent>编辑</TooltipContent>
+          </Tooltip>
         )}
         {deleteApi && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-destructive"
-            onClick={(e) => {
-              e.stopPropagation()
-              openDelete(item)
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-muted-foreground hover:text-destructive"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    openDelete(item)
+                  }}
+                >
+                  <Trash2 className="size-3.5" />
+                </Button>
+              }
+            />
+            <TooltipContent>删除</TooltipContent>
+          </Tooltip>
         )}
       </div>
     ),
@@ -843,9 +858,9 @@ export function Crud<T extends HasId, FormData = T>(
 
   return (
     <Card className="overflow-hidden">
-      {/* 搜索栏区域 */}
+      {/* 搜索栏 */}
       {searchFields && searchFields.length > 0 && (
-        <div className="border-b bg-muted/30 px-4 py-3">
+        <div className="border-b bg-muted/20 px-4 py-3">
           <CrudSearchForm
             fields={searchFields}
             values={searchFormValues}
@@ -859,20 +874,30 @@ export function Crud<T extends HasId, FormData = T>(
         </div>
       )}
 
-      {/* 操作栏区域 */}
-      <div className="flex items-center justify-between border-b px-4 py-2.5">
-        <CrudActionsBar
-          entityName={entityName}
-          showAdd={hasFormDialog}
-          onAdd={openAdd}
-          selectable={selectable}
-          selectedCount={selectedKeys.size}
-          showBatchDelete={batchDelete}
-          onBatchDelete={handleBatchDelete}
-        />
-      </div>
+      {/* 操作栏 */}
+      {(hasFormDialog || (selectable && batchDelete && deleteApi)) && (
+        <div className="flex items-center gap-2 border-b px-4 py-2.5">
+          {hasFormDialog && (
+            <Button onClick={openAdd} size="sm">
+              <Plus className="size-3.5" />
+              新增{entityName}
+            </Button>
+          )}
+          {selectable && batchDelete && deleteApi && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleBatchDelete}
+              disabled={selectedKeys.size === 0}
+            >
+              <Trash2 className="size-3.5" />
+              批量删除 ({selectedKeys.size})
+            </Button>
+          )}
+        </div>
+      )}
 
-      {/* 数据表格区域 - 表格贴边，无嵌套边框 */}
+      {/* 数据表格区域 - 贴边布局，无嵌套边框 */}
       <DataList
         data={data}
         columns={finalColumns}

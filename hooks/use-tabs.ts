@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { getPageTitle } from "@/lib/nav"
 import { local } from "@/lib/storage"
@@ -37,6 +37,20 @@ const HOME_TAB: TabItem = {
 }
 
 // -----------------------------------------------------------------------------
+// localStorage 读取（仅在客户端执行）
+// -----------------------------------------------------------------------------
+
+function readSavedTabs(): TabItem[] {
+  if (typeof window === "undefined") return [HOME_TAB]
+  const saved = local.get<TabState | null>(STORAGE_KEY, null)
+  if (saved?.tabs?.length) {
+    const hasHome = saved.tabs.some((t) => t.path === HOME_TAB.path)
+    return hasHome ? saved.tabs : [HOME_TAB, ...saved.tabs]
+  }
+  return [HOME_TAB]
+}
+
+// -----------------------------------------------------------------------------
 // Hook 实现
 // -----------------------------------------------------------------------------
 
@@ -52,55 +66,35 @@ const HOME_TAB: TabItem = {
 export function useTabs() {
   const router = useRouter()
   const pathname = usePathname()
-  const [tabs, setTabs] = useState<TabItem[]>([HOME_TAB])
-  const [activePath, setActivePath] = useState<string>(pathname)
-  const initialized = useRef(false)
 
-  // 从 localStorage 恢复 Tab 状态
-  useEffect(() => {
-    const saved = local.get<TabState | null>(STORAGE_KEY, null)
-    if (saved && saved.tabs && saved.tabs.length > 0) {
-      // 确保首页 Tab 始终存在且在第一位
-      const hasHome = saved.tabs.some((t) => t.path === HOME_TAB.path)
-      const restored = hasHome ? saved.tabs : [HOME_TAB, ...saved.tabs]
-      setTabs(restored)
-      setActivePath(saved.activePath || pathname)
+  // 懒初始化：从 localStorage 恢复 Tab 状态（SSR 时返回默认值）
+  const [tabs, setTabs] = useState<TabItem[]>(() => readSavedTabs())
+  const [activePath, setActivePath] = useState(pathname)
+
+  // 路由变化时自动添加/激活 Tab（在渲染期间调整状态，避免 effect 中 setState）
+  const [prevPathname, setPrevPathname] = useState(pathname)
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname)
+    if (pathname.startsWith("/admin")) {
+      const title = getPageTitle(pathname)
+      const isHome = pathname === HOME_TAB.path
+      setTabs((prev) => {
+        const existing = prev.find((t) => t.path === pathname)
+        if (existing) {
+          // 已存在，更新标题（可能动态菜单变了）
+          return prev.map((t) => (t.path === pathname ? { ...t, title } : t))
+        }
+        // 新增 Tab
+        return [...prev, { path: pathname, title, closable: !isHome }]
+      })
     }
-    initialized.current = true
-  }, [])
+    setActivePath(pathname)
+  }
 
-  // 持久化到 localStorage
+  // 持久化到 localStorage（更新外部系统，符合 effect 用途）
   useEffect(() => {
-    if (!initialized.current) return
     local.set<TabState>(STORAGE_KEY, { tabs, activePath })
   }, [tabs, activePath])
-
-  // 路由变化时自动添加/激活 Tab
-  useEffect(() => {
-    if (!initialized.current) return
-    // 只处理 /admin 下的路由
-    if (!pathname.startsWith("/admin")) return
-
-    const title = getPageTitle(pathname)
-    const isHome = pathname === HOME_TAB.path
-
-    setTabs((prev) => {
-      const existing = prev.find((t) => t.path === pathname)
-      if (existing) {
-        // 已存在，更新标题（可能动态菜单变了）
-        return prev.map((t) => (t.path === pathname ? { ...t, title } : t))
-      }
-      // 新增 Tab
-      const newTab: TabItem = {
-        path: pathname,
-        title,
-        closable: !isHome,
-      }
-      return [...prev, newTab]
-    })
-
-    setActivePath(pathname)
-  }, [pathname])
 
   // 点击 Tab 导航
   const navigateToTab = useCallback(

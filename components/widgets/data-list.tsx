@@ -189,6 +189,7 @@ function DataListPaginationBar({
           <PaginationItem>
             <PaginationPrevious
               href="#"
+              text="上一页"
               onClick={(e) => {
                 e.preventDefault()
                 if (page > 1) onPageChange(page - 1)
@@ -224,6 +225,7 @@ function DataListPaginationBar({
           <PaginationItem>
             <PaginationNext
               href="#"
+              text="下一页"
               onClick={(e) => {
                 e.preventDefault()
                 if (page < totalPages) onPageChange(page + 1)
@@ -342,7 +344,7 @@ export function DataList<T>({
           <Table>
             {/* 表头 */}
             <TableHeader>
-              <TableRow className="bg-muted/60 hover:bg-muted/60">
+              <TableRow className="bg-muted/30 hover:bg-muted/30">
                 {selectable && (
                   <TableHead className="w-12">
                     <Checkbox
@@ -358,7 +360,7 @@ export function DataList<T>({
                   <TableHead
                     key={col.key}
                     className={cn(
-                      "h-11 px-3 text-xs font-semibold tracking-wide text-muted-foreground uppercase",
+                      "h-10 px-4 text-xs font-semibold tracking-wide text-muted-foreground uppercase",
                       col.headerClassName
                     )}
                   >
@@ -408,12 +410,12 @@ export function DataList<T>({
                       key={key}
                       data-selected={isSelected || undefined}
                       className={cn(
-                        isSelected && "bg-primary/5",
+                        isSelected && "bg-primary/8",
                         "transition-colors"
                       )}
                     >
                       {selectable && (
-                        <TableCell className="px-3">
+                        <TableCell className="px-4">
                           <Checkbox
                             checked={isSelected}
                             onCheckedChange={(checked) =>
@@ -425,7 +427,7 @@ export function DataList<T>({
                       {columns.map((col) => (
                         <TableCell
                           key={col.key}
-                          className={cn("px-3 py-2.5", col.cellClassName)}
+                          className={cn("px-4 py-2.5", col.cellClassName)}
                         >
                           {col.cell(row)}
                         </TableCell>
@@ -437,7 +439,7 @@ export function DataList<T>({
           </Table>
           {/* 分页（嵌入表格底部） */}
           {pagination && (
-            <div className="border-t bg-muted/20 px-3 py-2">
+            <div className="border-t px-4 py-2.5">
               <DataListPaginationBar pagination={pagination} />
             </div>
           )}
