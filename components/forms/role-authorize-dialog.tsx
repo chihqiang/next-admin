@@ -59,8 +59,7 @@ export function RoleAuthorizeDialog({
   useEffect(() => {
     if (role) {
       const roleWithMenus = role as RoleFromRequest
-      const authorizedMenuIds =
-        roleWithMenus.menus?.map((m) => m.id) || []
+      const authorizedMenuIds = roleWithMenus.menus?.map((m) => m.id) || []
       setSelectedMenuIds(authorizedMenuIds)
     }
   }, [role])

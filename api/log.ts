@@ -1,5 +1,4 @@
-import request from "@/lib/request"
-import { PageRequest, PageResponse } from "@/lib/types/page"
+import request, { PageRequest, PageResponse } from "@/lib/request"
 
 // 日志信息
 export interface Log {

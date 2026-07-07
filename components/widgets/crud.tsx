@@ -26,7 +26,7 @@ import {
   DataListColumn,
   RenderCard,
 } from "@/components/widgets/data-list"
-import type { PageResponse } from "@/lib/types/page"
+import type { PageResponse } from "@/lib/request"
 
 // ============================================================================
 // 类型定义
@@ -920,9 +920,5 @@ export function Crud<T extends HasId, FormData = T>(
     </Card>
   )
 }
-
-// 别名：CrudTable 已弃用，使用 Crud
-/** @deprecated 使用 Crud 替代 */
-export const CrudTable = Crud
 
 export default Crud
