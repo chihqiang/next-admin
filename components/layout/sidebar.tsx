@@ -31,6 +31,8 @@ import { useAuth } from "@/hooks/use-auth"
 import { Icon } from "@/components/widgets/icon"
 import { getPageTitle } from "@/lib/nav"
 import { cn } from "@/lib/utils"
+import { useTabs } from "@/hooks/use-tabs"
+import { TabBar } from "@/components/layout/tab-bar"
 
 // 一级菜单项公共样式
 const menuItemClass =
@@ -44,6 +46,15 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
   const { authAccount, getCurrentMenuTree } = useAuth()
+  const {
+    tabs,
+    activePath,
+    navigateToTab,
+    closeTab,
+    closeOtherTabs,
+    closeAllTabs,
+    refreshTab,
+  } = useTabs()
   const accountData = {
     account: {
       name: authAccount?.name || "管理员",
@@ -210,6 +221,16 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
             <span className="sr-only">切换主题</span>
           </Button>
         </header>
+        {/* 多标签页栏 */}
+        <TabBar
+          tabs={tabs}
+          activePath={activePath}
+          onNavigate={navigateToTab}
+          onClose={closeTab}
+          onCloseOthers={closeOtherTabs}
+          onCloseAll={closeAllTabs}
+          onRefresh={refreshTab}
+        />
         <div className="min-w-0 flex-1 overflow-y-auto p-4">{children}</div>
       </SidebarInset>
     </SidebarProvider>

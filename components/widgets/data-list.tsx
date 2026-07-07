@@ -330,11 +330,11 @@ export function DataList<T>({
     <div className={cn("space-y-4", className)}>
       {/* ==================== 桌面端：表格视图 ==================== */}
       {!isMobile && (
-        <div className="rounded-md border">
+        <div className="overflow-hidden rounded-lg border">
           <Table>
             {/* 表头 */}
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-muted/60 hover:bg-muted/60">
                 {selectable && (
                   <TableHead className="w-12">
                     <Checkbox
@@ -347,7 +347,13 @@ export function DataList<T>({
                   </TableHead>
                 )}
                 {columns.map((col) => (
-                  <TableHead key={col.key} className={col.headerClassName}>
+                  <TableHead
+                    key={col.key}
+                    className={cn(
+                      "h-11 px-3 text-xs font-semibold tracking-wide text-muted-foreground uppercase",
+                      col.headerClassName
+                    )}
+                  >
                     {col.header}
                   </TableHead>
                 ))}
@@ -358,19 +364,22 @@ export function DataList<T>({
             <TableBody>
               {/* 加载中状态 */}
               {loading && (
-                <TableRow>
+                <TableRow className="hover:bg-transparent">
                   <TableCell
                     colSpan={totalColumns}
                     className="h-32 text-center text-muted-foreground"
                   >
-                    加载中...
+                    <span className="inline-flex items-center gap-2">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      加载中...
+                    </span>
                   </TableCell>
                 </TableRow>
               )}
 
               {/* 空数据状态 */}
               {!loading && isEmpty && (
-                <TableRow>
+                <TableRow className="hover:bg-transparent">
                   <TableCell
                     colSpan={totalColumns}
                     className="h-32 text-center text-muted-foreground"
@@ -387,9 +396,16 @@ export function DataList<T>({
                   const key = keyExtractor(row)
                   const isSelected = selectedRowKeys.has(key)
                   return (
-                    <TableRow key={key} data-selected={isSelected || undefined}>
+                    <TableRow
+                      key={key}
+                      data-selected={isSelected || undefined}
+                      className={cn(
+                        isSelected && "bg-primary/5",
+                        "transition-colors"
+                      )}
+                    >
                       {selectable && (
-                        <TableCell>
+                        <TableCell className="px-3">
                           <Checkbox
                             checked={isSelected}
                             onCheckedChange={(checked) =>
@@ -399,7 +415,10 @@ export function DataList<T>({
                         </TableCell>
                       )}
                       {columns.map((col) => (
-                        <TableCell key={col.key} className={col.cellClassName}>
+                        <TableCell
+                          key={col.key}
+                          className={cn("px-3 py-2.5", col.cellClassName)}
+                        >
                           {col.cell(row)}
                         </TableCell>
                       ))}

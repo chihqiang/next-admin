@@ -4,7 +4,7 @@ import { ReactNode, useState, useCallback, useEffect } from "react"
 import { Search, Edit, Trash2, Plus } from "lucide-react"
 import { toast } from "sonner"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -59,8 +59,8 @@ export interface HasId {
  * Crud 组件配置
  */
 export interface CrudProps<T extends HasId, FormData = T> {
-  /** 页面标题 */
-  title: string
+  /** 页面标题（可选，不在内容区显示，仅用于语义） */
+  title?: string
   /** 实体名称 */
   entityName: string
 
@@ -96,6 +96,11 @@ export interface CrudProps<T extends HasId, FormData = T> {
   updateApi?: (data: FormData & { id: number }) => Promise<unknown>
   /** 获取详情 API */
   detailApi?: (id: number) => Promise<FormData>
+
+  /** 弹窗最大宽度 @default "600px" */
+  dialogWidth?: string
+  /** 弹窗最大高度 @default "85vh" */
+  dialogHeight?: string
 
   /** 自定义操作列（完全替换默认操作） */
   renderActions?: (item: T) => ReactNode
@@ -219,6 +224,10 @@ interface CrudFormDialogProps<FormData> {
   }>
   /** 是否加载中 */
   loading?: boolean
+  /** 弹窗最大宽度 @default "600px" */
+  dialogWidth?: string
+  /** 弹窗最大高度 @default "85vh" */
+  dialogHeight?: string
 }
 
 /**
@@ -235,6 +244,8 @@ export function CrudFormDialog<FormData>({
   onFormChange,
   formComponent: FormComponent,
   loading = false,
+  dialogWidth = "600px",
+  dialogHeight = "85vh",
 }: CrudFormDialogProps<FormData>) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -243,7 +254,10 @@ export function CrudFormDialog<FormData>({
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[600px]">
+      <DialogContent
+        className="overflow-y-auto"
+        style={{ maxWidth: dialogWidth, maxHeight: dialogHeight }}
+      >
         <DialogHeader>
           <DialogTitle>
             {isEdit ? `编辑${entityName}` : `新增${entityName}`}
@@ -509,6 +523,8 @@ export function Crud<T extends HasId, FormData = T>(
     renderActions,
     extraActions,
     getItemName,
+    dialogWidth,
+    dialogHeight,
   } = props
 
   // 数据状态
@@ -826,13 +842,10 @@ export function Crud<T extends HasId, FormData = T>(
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 p-4">
         {/* 搜索表单 */}
         {searchFields && searchFields.length > 0 && (
-          <div className="mb-4">
+          <div className="mb-2">
             <CrudSearchForm
               fields={searchFields}
               values={searchFormValues}
@@ -892,6 +905,8 @@ export function Crud<T extends HasId, FormData = T>(
           onFormChange={setFormData}
           formComponent={FormComponent}
           loading={submitLoading}
+          {...(dialogWidth ? { dialogWidth } : {})}
+          {...(dialogHeight ? { dialogHeight } : {})}
         />
       )}
 

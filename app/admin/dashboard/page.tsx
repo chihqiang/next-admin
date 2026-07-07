@@ -2,7 +2,6 @@
 
 import { memo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { LayoutDashboard } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 /**
@@ -140,11 +139,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-2">
-        <LayoutDashboard className="h-6 w-6 text-muted-foreground" />
-        <h1 className="text-2xl font-bold">控制台</h1>
-      </div>
-
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => (
           <StatCard key={index} {...stat} />
