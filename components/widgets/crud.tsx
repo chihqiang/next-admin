@@ -26,18 +26,11 @@ import {
   DataListColumn,
   RenderCard,
 } from "@/components/widgets/data-list"
+import type { PageResponse } from "@/lib/types/page"
 
 // ============================================================================
 // 类型定义
 // ============================================================================
-
-/**
- * 分页响应接口
- */
-export interface PageResponse<T> {
-  data: T[]
-  total: number
-}
 
 /**
  * 搜索字段配置

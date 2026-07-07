@@ -1,5 +1,6 @@
 import request from "@/lib/request"
 import { PageRequest, PageResponse } from "@/lib/types/page"
+import type { Menu } from "@/api/menu"
 
 export interface Role {
   id: number
@@ -9,15 +10,14 @@ export interface Role {
   remark: string
 }
 
-export interface RoleFromRequest extends Role {
-  menus: Menu[]
-}
+/**
+ * 角色关联的菜单信息（Menu 的子集）
+ * 角色列表接口返回的菜单只包含 id/pid/name/remark 字段
+ */
+export type RoleMenu = Pick<Menu, "id" | "pid" | "name" | "remark">
 
-export interface Menu {
-  id: number
-  pid: number
-  name: string
-  remark: string
+export interface RoleFromRequest extends Role {
+  menus: RoleMenu[]
 }
 
 export interface RoleListRequest extends PageRequest {
