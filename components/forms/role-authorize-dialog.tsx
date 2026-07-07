@@ -109,10 +109,7 @@ export function RoleAuthorizeDialog({
           >
             取消
           </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={isLoading || isLoadingMenus}
-          >
+          <Button onClick={handleSubmit} disabled={isLoading || isLoadingMenus}>
             {isLoading ? "授权中..." : "保存授权"}
           </Button>
         </DialogFooter>

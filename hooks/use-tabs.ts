@@ -88,9 +88,7 @@ export function useTabs() {
       const existing = prev.find((t) => t.path === pathname)
       if (existing) {
         // 已存在，更新标题（可能动态菜单变了）
-        return prev.map((t) =>
-          t.path === pathname ? { ...t, title } : t
-        )
+        return prev.map((t) => (t.path === pathname ? { ...t, title } : t))
       }
       // 新增 Tab
       const newTab: TabItem = {
@@ -125,8 +123,7 @@ export function useTabs() {
         // 如果关闭的是当前激活的 Tab，跳转到相邻 Tab
         if (path === activePath) {
           const closedIndex = prev.findIndex((t) => t.path === path)
-          const nextActive =
-            newTabs[Math.min(closedIndex, newTabs.length - 1)]
+          const nextActive = newTabs[Math.min(closedIndex, newTabs.length - 1)]
           if (nextActive) {
             router.push(nextActive.path)
           }
@@ -146,9 +143,7 @@ export function useTabs() {
         if (!target) return prev
 
         // 保留目标 Tab + 首页 Tab（如果不同）
-        const keep = prev.filter(
-          (t) => t.path === path || !t.closable
-        )
+        const keep = prev.filter((t) => t.path === path || !t.closable)
 
         // 如果目标 Tab 不是当前路由，跳转过去
         if (path !== pathname) {

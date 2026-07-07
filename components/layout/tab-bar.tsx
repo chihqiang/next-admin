@@ -87,7 +87,7 @@ function TabBarItem({
                   e.stopPropagation()
                   onClose()
                 }}
-                className="ml-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm opacity-0 transition-opacity hover:bg-muted-foreground/20 group-hover:opacity-100"
+                className="ml-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted-foreground/20"
                 aria-label="关闭标签"
               >
                 <X className="h-3 w-3" />
@@ -101,17 +101,11 @@ function TabBarItem({
         }
       />
       <ContextMenuContent>
-        <ContextMenuItem
-          onClick={onRefresh}
-          disabled={!isActive}
-        >
+        <ContextMenuItem onClick={onRefresh} disabled={!isActive}>
           <RefreshCw className="mr-2 h-4 w-4" />
           刷新
         </ContextMenuItem>
-        <ContextMenuItem
-          onClick={onClose}
-          disabled={!tab.closable}
-        >
+        <ContextMenuItem onClick={onClose} disabled={!tab.closable}>
           <X className="mr-2 h-4 w-4" />
           关闭
         </ContextMenuItem>
@@ -149,9 +143,8 @@ export function TabBar({
     const container = scrollRef.current
     if (!container) return
 
-    const activeEl = container.querySelector<HTMLButtonElement>(
-      `[data-active="true"]`
-    )
+    const activeEl =
+      container.querySelector<HTMLButtonElement>(`[data-active="true"]`)
     if (activeEl) {
       activeEl.scrollIntoView({
         behavior: "smooth",
@@ -166,7 +159,7 @@ export function TabBar({
       {/* 可滚动的 Tab 区域 */}
       <div
         ref={scrollRef}
-        className="flex flex-1 items-center gap-0.5 overflow-x-auto px-2 scroll-smooth [&::-webkit-scrollbar]:hidden"
+        className="flex flex-1 items-center gap-0.5 overflow-x-auto scroll-smooth px-2 [&::-webkit-scrollbar]:hidden"
         style={{ scrollbarWidth: "none" }}
       >
         {tabs.map((tab) => (

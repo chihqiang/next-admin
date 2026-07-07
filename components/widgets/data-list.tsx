@@ -330,7 +330,7 @@ export function DataList<T>({
     <div className={cn("space-y-4", className)}>
       {/* ==================== 桌面端：表格视图 ==================== */}
       {!isMobile && (
-        <div className="overflow-hidden rounded-lg border">
+        <div className="overflow-hidden rounded-lg border border-border/60">
           <Table>
             {/* 表头 */}
             <TableHeader>
@@ -427,6 +427,12 @@ export function DataList<T>({
                 })}
             </TableBody>
           </Table>
+          {/* 分页（嵌入表格底部） */}
+          {pagination && (
+            <div className="border-t bg-muted/20 px-3 py-2">
+              <DataListPaginationBar pagination={pagination} />
+            </div>
+          )}
         </div>
       )}
 
@@ -472,8 +478,10 @@ export function DataList<T>({
         </div>
       )}
 
-      {/* ==================== 分页 ==================== */}
-      {pagination && <DataListPaginationBar pagination={pagination} />}
+      {/* ==================== 移动端分页 ==================== */}
+      {isMobile && pagination && (
+        <DataListPaginationBar pagination={pagination} />
+      )}
     </div>
   )
 }

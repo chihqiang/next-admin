@@ -4,8 +4,9 @@ import { ReactNode, useState, useCallback, useEffect } from "react"
 import { Search, Edit, Trash2, Plus } from "lucide-react"
 import { toast } from "sonner"
 
-import { Card, CardContent } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Dialog,
   DialogContent,
@@ -147,16 +148,16 @@ export function CrudSearchForm({
         e.preventDefault()
         onSearch()
       }}
-      className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end"
+      className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center"
     >
       {fields.map((field) => (
-        <div key={field.name} className="flex items-center gap-2">
+        <div key={field.name} className="flex items-center gap-1.5">
           {field.type === "select" ? (
             <Select
               value={values[field.name] || ""}
               onValueChange={(value) => onValueChange(field.name, value || "")}
             >
-              <SelectTrigger size="sm" className="w-full sm:w-32">
+              <SelectTrigger size="sm" className="w-full sm:w-36">
                 <SelectValue placeholder={field.label} />
               </SelectTrigger>
               <SelectContent>
@@ -168,20 +169,20 @@ export function CrudSearchForm({
               </SelectContent>
             </Select>
           ) : (
-            <input
+            <Input
               type="text"
               name={field.name}
               placeholder={field.placeholder || field.label}
               value={values[field.name] || ""}
               onChange={(e) => onValueChange(field.name, e.target.value)}
-              className="h-7 w-full rounded-md border border-input bg-background px-2 text-sm sm:w-40"
+              className="h-8 w-full sm:w-44"
             />
           )}
         </div>
       ))}
-      <div className="col-span-2 flex gap-2 sm:col-span-1">
+      <div className="flex gap-2">
         <Button type="submit" size="sm" disabled={loading}>
-          <Search className="mr-2 h-4 w-4" />
+          <Search className="mr-1.5 h-4 w-4" />
           搜索
         </Button>
         <Button
@@ -443,7 +444,7 @@ export function CrudActionsBar({
       <div className="flex flex-wrap items-center gap-2">
         {showAdd && onAdd && (
           <Button onClick={onAdd} size="sm">
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="mr-1.5 h-4 w-4" />
             新增{entityName}
           </Button>
         )}
@@ -457,7 +458,7 @@ export function CrudActionsBar({
           onClick={onBatchDelete}
           disabled={selectedCount === 0}
         >
-          <Trash2 className="mr-2 h-4 w-4" />
+          <Trash2 className="mr-1.5 h-4 w-4" />
           批量删除 ({selectedCount})
         </Button>
       )}
@@ -841,25 +842,25 @@ export function Crud<T extends HasId, FormData = T>(
   const hasFormDialog = !!(FormComponent && createApi && updateApi)
 
   return (
-    <Card>
-      <CardContent className="space-y-4 p-4">
-        {/* 搜索表单 */}
-        {searchFields && searchFields.length > 0 && (
-          <div className="mb-2">
-            <CrudSearchForm
-              fields={searchFields}
-              values={searchFormValues}
-              onValueChange={(name, value) =>
-                setSearchFormValues((prev) => ({ ...prev, [name]: value }))
-              }
-              onSearch={handleSearch}
-              onReset={handleReset}
-              loading={loading}
-            />
-          </div>
-        )}
+    <Card className="overflow-hidden">
+      {/* 搜索栏区域 */}
+      {searchFields && searchFields.length > 0 && (
+        <div className="border-b bg-muted/30 px-4 py-3">
+          <CrudSearchForm
+            fields={searchFields}
+            values={searchFormValues}
+            onValueChange={(name, value) =>
+              setSearchFormValues((prev) => ({ ...prev, [name]: value }))
+            }
+            onSearch={handleSearch}
+            onReset={handleReset}
+            loading={loading}
+          />
+        </div>
+      )}
 
-        {/* 操作栏 */}
+      {/* 操作栏区域 */}
+      <div className="flex items-center justify-between px-4 py-3">
         <CrudActionsBar
           entityName={entityName}
           showAdd={hasFormDialog}
@@ -869,8 +870,10 @@ export function Crud<T extends HasId, FormData = T>(
           showBatchDelete={batchDelete}
           onBatchDelete={handleBatchDelete}
         />
+      </div>
 
-        {/* 数据表格 */}
+      {/* 数据表格区域 */}
+      <div className="px-4 pb-4">
         <DataList
           data={data}
           columns={finalColumns}
@@ -891,7 +894,7 @@ export function Crud<T extends HasId, FormData = T>(
           onSelectRow={handleSelectRow}
           onSelectAll={handleSelectAll}
         />
-      </CardContent>
+      </div>
 
       {/* 新增/编辑弹窗 */}
       {hasFormDialog && (
