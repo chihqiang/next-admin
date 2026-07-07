@@ -860,7 +860,7 @@ export function Crud<T extends HasId, FormData = T>(
       )}
 
       {/* 操作栏区域 */}
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between border-b px-4 py-2.5">
         <CrudActionsBar
           entityName={entityName}
           showAdd={hasFormDialog}
@@ -872,29 +872,28 @@ export function Crud<T extends HasId, FormData = T>(
         />
       </div>
 
-      {/* 数据表格区域 */}
-      <div className="px-4 pb-4">
-        <DataList
-          data={data}
-          columns={finalColumns}
-          renderCard={defaultRenderCard}
-          keyExtractor={(item) => String(item.id)}
-          loading={loading}
-          pagination={{
-            page,
-            pageSize,
-            total,
-            onPageChange: setPage,
-          }}
-          emptyText={`暂无${entityName}数据`}
-          selectable={selectable}
-          selectedRowKeys={selectedKeys}
-          isAllSelected={isAllSelected}
-          isPartiallySelected={isPartiallySelected}
-          onSelectRow={handleSelectRow}
-          onSelectAll={handleSelectAll}
-        />
-      </div>
+      {/* 数据表格区域 - 表格贴边，无嵌套边框 */}
+      <DataList
+        data={data}
+        columns={finalColumns}
+        renderCard={defaultRenderCard}
+        keyExtractor={(item) => String(item.id)}
+        loading={loading}
+        pagination={{
+          page,
+          pageSize,
+          total,
+          onPageChange: setPage,
+        }}
+        emptyText={`暂无${entityName}数据`}
+        selectable={selectable}
+        selectedRowKeys={selectedKeys}
+        isAllSelected={isAllSelected}
+        isPartiallySelected={isPartiallySelected}
+        onSelectRow={handleSelectRow}
+        onSelectAll={handleSelectAll}
+        bordered={false}
+      />
 
       {/* 新增/编辑弹窗 */}
       {hasFormDialog && (

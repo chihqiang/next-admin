@@ -100,6 +100,8 @@ interface DataListProps<T> {
   onSelectRow?: (key: string, checked: boolean) => void
   /** 全选/取消全选回调 */
   onSelectAll?: (checked: boolean) => void
+  /** 表格是否自带边框 @default true */
+  bordered?: boolean
 }
 
 // -----------------------------------------------------------------------------
@@ -294,6 +296,7 @@ export function DataList<T>({
   isPartiallySelected = false,
   onSelectRow,
   onSelectAll,
+  bordered = true,
 }: DataListProps<T>) {
   const isMobile = useIsMobile()
   const isEmpty = !loading && data.length === 0
@@ -330,7 +333,12 @@ export function DataList<T>({
     <div className={cn("space-y-4", className)}>
       {/* ==================== 桌面端：表格视图 ==================== */}
       {!isMobile && (
-        <div className="overflow-hidden rounded-lg border border-border/60">
+        <div
+          className={cn(
+            "overflow-hidden",
+            bordered && "rounded-lg border border-border/60"
+          )}
+        >
           <Table>
             {/* 表头 */}
             <TableHeader>
