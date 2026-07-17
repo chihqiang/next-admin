@@ -269,6 +269,9 @@ export function CrudFormDialog<FormData>({
           <DialogTitle>
             {isEdit ? `编辑${entityName}` : `新增${entityName}`}
           </DialogTitle>
+          <DialogDescription>
+            {isEdit ? `编辑${entityName}信息` : `创建新的${entityName}`}
+          </DialogDescription>
         </DialogHeader>
 
         {formData && (
@@ -284,7 +287,6 @@ export function CrudFormDialog<FormData>({
           <Button
             type="submit"
             form="crud-form"
-            onClick={handleSubmit}
             disabled={loading}
           >
             {loading && (
@@ -545,6 +547,9 @@ export function Crud<T extends HasId, FormData = T>(
   const [currentItem, setCurrentItem] = useState<T | null>(null)
   const [formData, setFormData] = useState<FormData | null>(null)
   const [submitLoading, setSubmitLoading] = useState(false)
+  const [editLoading, setEditLoading] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [batchDeleteLoading, setBatchDeleteLoading] = useState(false)
 
   // 搜索表单值
   const [searchFormValues, setSearchFormValues] = useState<
@@ -603,6 +608,7 @@ export function Crud<T extends HasId, FormData = T>(
     async (item: T) => {
       setDialogMode("edit")
       setCurrentItem(item)
+      setEditLoading(true)
 
       if (detailApi) {
         try {
@@ -610,9 +616,12 @@ export function Crud<T extends HasId, FormData = T>(
           setFormData(detail)
         } catch {
           setFormData(item as unknown as FormData)
+        } finally {
+          setEditLoading(false)
         }
       } else {
         setFormData(item as unknown as FormData)
+        setEditLoading(false)
       }
     },
     [detailApi]
@@ -670,7 +679,7 @@ export function Crud<T extends HasId, FormData = T>(
   const handleDelete = useCallback(async () => {
     if (!deleteApi || !currentItem) return
 
-    setSubmitLoading(true)
+    setDeleteLoading(true)
     try {
       await deleteApi(currentItem.id)
       toast.success(`${entityName}删除成功`)
@@ -680,7 +689,7 @@ export function Crud<T extends HasId, FormData = T>(
       const msg = error instanceof Error ? error.message : "删除失败"
       toast.error(msg)
     } finally {
-      setSubmitLoading(false)
+      setDeleteLoading(false)
     }
   }, [deleteApi, currentItem, entityName, closeDialog, fetchData])
 
@@ -697,7 +706,7 @@ export function Crud<T extends HasId, FormData = T>(
     if (!deleteApi) return
 
     const ids = Array.from(selectedKeys).map(Number)
-    setSubmitLoading(true)
+    setBatchDeleteLoading(true)
     setShowBatchDeleteConfirm(false)
 
     try {
@@ -709,7 +718,7 @@ export function Crud<T extends HasId, FormData = T>(
       const msg = error instanceof Error ? error.message : "批量删除失败"
       toast.error(msg)
     } finally {
-      setSubmitLoading(false)
+      setBatchDeleteLoading(false)
     }
   }, [deleteApi, selectedKeys, entityName, fetchData])
 
@@ -944,7 +953,7 @@ export function Crud<T extends HasId, FormData = T>(
           onClose={closeDialog}
           onConfirm={handleDelete}
           itemName={getDeleteItemName()}
-          loading={submitLoading}
+          loading={deleteLoading}
         />
       )}
 
@@ -954,9 +963,9 @@ export function Crud<T extends HasId, FormData = T>(
           open={showBatchDeleteConfirm}
           onClose={() => setShowBatchDeleteConfirm(false)}
           onConfirm={confirmBatchDelete}
-          entityName={entityName}
           count={selectedKeys.size}
-          loading={submitLoading}
+          entityName={entityName}
+          loading={batchDeleteLoading}
         />
       )}
     </Card>

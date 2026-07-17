@@ -1,6 +1,6 @@
 "use client"
 
-import { useId } from "react"
+import { useEffect, useId, useRef, useState } from "react"
 import {
   BellIcon,
   LogOutIcon,
@@ -36,13 +36,22 @@ export function NavAccount({
   const id = useId()
   const { logout } = useAuth()
   const router = useRouter()
-  const handleLogout = async () => {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
+  const handleLogout = () => {
     logout()
     toast.success("退出登录成功", {
       description: "正在跳转至登录页...",
     })
-    // 退出登录成功后，定时跳转到登录页
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       router.push("/login")
     }, 1000)
   }

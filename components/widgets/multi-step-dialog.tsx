@@ -96,10 +96,14 @@ export function MultiStepDialog({
 
   const reset = () => {
     setOpen(false)
-    setTimeout(() => {
+  }
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      reset()
       setCurrentStep(0)
       setFormValues({})
-    }, 300)
+    }
   }
 
   const step = steps[currentStep]
@@ -117,7 +121,7 @@ export function MultiStepDialog({
         {triggerText}
       </button>
 
-      <Dialog open={open} onOpenChange={reset}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{step.title}</DialogTitle>

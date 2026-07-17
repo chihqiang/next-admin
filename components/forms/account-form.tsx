@@ -19,14 +19,22 @@ interface AccountFormProps {
 export function AccountForm({ formData, onChange }: AccountFormProps) {
   const [roleOptions, setRoleOptions] = useState<LSelectOption[]>([])
   useEffect(() => {
-    roleAllListApi().then((roles) => {
-      setRoleOptions(
-        roles.map((role) => ({
-          value: role.id,
-          label: role.name,
-        }))
-      )
-    })
+    let cancelled = false
+    roleAllListApi()
+      .then((roles) => {
+        if (!cancelled) {
+          setRoleOptions(
+            roles.map((role) => ({
+              value: role.id,
+              label: role.name,
+            }))
+          )
+        }
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   return (

@@ -36,17 +36,5 @@ export interface UseAuthReturn {
  * @returns 权限相关状态和方法集合
  */
 export const useAuth = (): UseAuthReturn => {
-  const context = useAuthContext()
-
-  return {
-    authToken: context.authToken,
-    authAccount: context.authAccount,
-    isLoading: context.isLoading,
-    login: context.login,
-    setCurrentAccount: context.setCurrentAccount,
-    getCurrentMenuTree: context.getCurrentMenuTree,
-    logout: context.logout,
-    getID: context.getID,
-    isLoggedIn: context.isLoggedIn,
-  }
+  return useAuthContext()
 }

@@ -202,7 +202,7 @@ function DataListPaginationBar({
           {/* 数字页码 & 省略号 */}
           {pageNumbers.map((item, index) =>
             item === "..." ? (
-              <PaginationItem key={`el-${index}`}>
+              <PaginationItem key={`el-${index}-ellipsis`}>
                 <PaginationEllipsis />
               </PaginationItem>
             ) : (
@@ -293,13 +293,14 @@ export function DataList<T>({
   emptyText = "暂无数据",
   className,
   selectable = false,
-  selectedRowKeys = new Set<string>(),
+  selectedRowKeys,
   isAllSelected = false,
   isPartiallySelected = false,
   onSelectRow,
   onSelectAll,
   bordered = true,
 }: DataListProps<T>) {
+  const effectiveSelectedRowKeys = selectedRowKeys ?? new Set<string>()
   const isMobile = useIsMobile()
   const isEmpty = !loading && data.length === 0
 
@@ -309,7 +310,7 @@ export function DataList<T>({
   // 渲染单张卡片（含选择框）
   const renderMobileCard = (row: T) => {
     const key = keyExtractor(row)
-    const isSelected = selectedRowKeys.has(key)
+    const isSelected = effectiveSelectedRowKeys.has(key)
     const cardContent = renderCard ? (
       renderCard(row)
     ) : (
@@ -404,7 +405,7 @@ export function DataList<T>({
                 !isEmpty &&
                 data.map((row) => {
                   const key = keyExtractor(row)
-                  const isSelected = selectedRowKeys.has(key)
+    const isSelected = effectiveSelectedRowKeys.has(key)
                   return (
                     <TableRow
                       key={key}
@@ -460,7 +461,7 @@ export function DataList<T>({
                 onCheckedChange={(checked) => onSelectAll?.(!!checked)}
               />
               <span className="text-sm text-muted-foreground">
-                全选 ({selectedRowKeys.size}/{data.length})
+                全选 ({effectiveSelectedRowKeys.size}/{data.length})
               </span>
             </div>
           )}
@@ -500,6 +501,7 @@ export function DataList<T>({
 // 卡片组件：RenderCard（自定义卡片）
 // 支持：标题、副标题、状态、元数据、操作按钮
 // 可自定义图标
+// 配合 DataList 组件使用，实现自定义卡片渲染
 // -----------------------------------------------------------------------------
 export interface RenderCardProps<T> {
   entity: T

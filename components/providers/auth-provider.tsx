@@ -21,6 +21,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
   ReactNode,
 } from "react"
 
@@ -133,17 +134,30 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [authToken])
 
   // Context 值
-  const contextValue: AuthContextType = {
-    authToken,
-    authAccount,
-    isLoading,
-    login,
-    setCurrentAccount,
-    getCurrentMenuTree,
-    logout,
-    getID,
-    isLoggedIn,
-  }
+  const contextValue = useMemo<AuthContextType>(
+    () => ({
+      authToken,
+      authAccount,
+      isLoading,
+      login,
+      setCurrentAccount,
+      getCurrentMenuTree,
+      logout,
+      getID,
+      isLoggedIn,
+    }),
+    [
+      authToken,
+      authAccount,
+      isLoading,
+      login,
+      setCurrentAccount,
+      getCurrentMenuTree,
+      logout,
+      getID,
+      isLoggedIn,
+    ]
+  )
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>

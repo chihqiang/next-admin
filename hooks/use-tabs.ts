@@ -108,23 +108,26 @@ export function useTabs() {
   // 关闭单个 Tab
   const closeTab = useCallback(
     (path: string) => {
+      let navigateTo: string | null = null
       setTabs((prev) => {
         const target = prev.find((t) => t.path === path)
         if (!target || !target.closable) return prev
 
         const newTabs = prev.filter((t) => t.path !== path)
 
-        // 如果关闭的是当前激活的 Tab，跳转到相邻 Tab
         if (path === activePath) {
           const closedIndex = prev.findIndex((t) => t.path === path)
           const nextActive = newTabs[Math.min(closedIndex, newTabs.length - 1)]
           if (nextActive) {
-            router.push(nextActive.path)
+            navigateTo = nextActive.path
           }
         }
 
         return newTabs
       })
+      if (navigateTo) {
+        router.push(navigateTo)
+      }
     },
     [activePath, router]
   )
@@ -132,20 +135,15 @@ export function useTabs() {
   // 关闭其他 Tab
   const closeOtherTabs = useCallback(
     (path: string) => {
+      let needNavigate = path !== pathname
       setTabs((prev) => {
         const target = prev.find((t) => t.path === path)
         if (!target) return prev
-
-        // 保留目标 Tab + 首页 Tab（如果不同）
-        const keep = prev.filter((t) => t.path === path || !t.closable)
-
-        // 如果目标 Tab 不是当前路由，跳转过去
-        if (path !== pathname) {
-          router.push(path)
-        }
-
-        return keep
+        return prev.filter((t) => t.path === path || !t.closable)
       })
+      if (needNavigate) {
+        router.push(path)
+      }
     },
     [router, pathname]
   )
@@ -159,17 +157,16 @@ export function useTabs() {
     }
   }, [router, pathname])
 
-  // 刷新当前 Tab（关闭再重新导航）
+  // 刷新当前 Tab
   const refreshTab = useCallback(
     (path: string) => {
-      // 通过移除再添加来触发组件重新挂载
-      setActivePath("")
-      setTimeout(() => {
-        setActivePath(path)
+      if (path === pathname) {
+        router.refresh()
+      } else {
         router.push(path)
-      }, 0)
+      }
     },
-    [router]
+    [router, pathname]
   )
 
   return {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { MultiStepDialog } from "@/components/widgets/multi-step-dialog"
 
@@ -11,6 +11,16 @@ interface ForgotPasswordDialogProps {
 export function ForgotPasswordDialog({ className }: ForgotPasswordDialogProps) {
   const [countdown, setCountdown] = useState(0)
   const [, setEmail] = useState("")
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+      }
+    }
+  }, [])
+
   return (
     <MultiStepDialog
       className={className}
@@ -33,18 +43,20 @@ export function ForgotPasswordDialog({ className }: ForgotPasswordDialogProps) {
               },
             },
           ],
-          actionText: "发送验证码",
+          actionText: countdown > 0 ? `${countdown}s 后重发` : "发送验证码",
           onSubmitAction: async (values) => {
-            setEmail(values.email!)
+            setEmail(values.email ?? "")
             await new Promise((r) => setTimeout(r, 1000))
             toast.success("验证码已发送", {
               description: `验证码已发送至 ${values.email}，请查收。`,
             })
             setCountdown(60)
-            const timer = setInterval(() => {
+            if (timerRef.current) clearInterval(timerRef.current)
+            timerRef.current = setInterval(() => {
               setCountdown((p) => {
                 if (p <= 1) {
-                  clearInterval(timer)
+                  if (timerRef.current) clearInterval(timerRef.current)
+                  timerRef.current = null
                   return 0
                 }
                 return p - 1
@@ -92,11 +104,14 @@ export function ForgotPasswordDialog({ className }: ForgotPasswordDialogProps) {
         },
       ]}
       onCompleteAction={async (values) => {
-        console.log("onCompleteAction", values)
         await new Promise((r) => setTimeout(r, 1000))
         toast.success("密码重置成功", {
           description: "请使用新密码登录。",
         })
+        if (timerRef.current) {
+          clearInterval(timerRef.current)
+          timerRef.current = null
+        }
         setCountdown(0)
         setEmail("")
       }}

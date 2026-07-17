@@ -24,7 +24,15 @@ export function MenuForm({ formData, onChange }: MenuFormProps) {
   const [menus, setMenus] = useState<Menu[]>([])
 
   useEffect(() => {
-    menuAllApi().then(setMenus)
+    let cancelled = false
+    menuAllApi()
+      .then((data) => {
+        if (!cancelled) setMenus(data)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const parentMenus = menus.filter((menu) => menu.menu_type === 1)

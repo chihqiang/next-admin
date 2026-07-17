@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { Shield } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   Role,
@@ -41,6 +42,7 @@ export default function RolesPage() {
   const [isAuthorizeOpen, setIsAuthorizeOpen] = useState(false)
   const [authorizeRole, setAuthorizeRole] = useState<Role | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [isAuthorizing, setIsAuthorizing] = useState(false)
 
   // 关闭授权弹窗
   const closeAuthorize = useCallback(() => {
@@ -51,12 +53,17 @@ export default function RolesPage() {
   // 处理授权
   const handleAuthorize = useCallback(
     async (roleId: number, menuIds: number[]) => {
+      setIsAuthorizing(true)
       try {
         await roleAssociateMenusApi(roleId, menuIds)
         closeAuthorize()
         setRefreshKey((k) => k + 1)
+        toast.success("授权成功")
       } catch (error) {
         console.error("授权失败", error)
+        toast.error("授权失败，请稍后重试")
+      } finally {
+        setIsAuthorizing(false)
       }
     },
     [closeAuthorize]
@@ -135,7 +142,7 @@ export default function RolesPage() {
         onOpenChange={closeAuthorize}
         role={authorizeRole}
         onAuthorize={handleAuthorize}
-        isLoading={false}
+        isLoading={isAuthorizing}
       />
     </>
   )

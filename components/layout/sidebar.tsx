@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useMemo } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -72,11 +72,11 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
     },
   }
   // 获取当前菜单树
-  const menuTree = getCurrentMenuTree()
+  const menuTree = useMemo(() => getCurrentMenuTree(), [getCurrentMenuTree])
   const { searchKeyword, setSearchKeyword, searchResults, isSearching } =
     useMenuSearch(menuTree)
 
-  // 初始化菜单展开状态（使用懒初始化，避免每次渲染都执行计算）
+  // 初始化菜单展开状态
   const [menuOpenState, setMenuOpenState] = useState<Record<string, boolean>>(
     () => {
       return menuTree.reduce(
@@ -92,6 +92,23 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
       )
     }
   )
+
+  // 当菜单树变化时同步展开状态
+  useEffect(() => {
+    setMenuOpenState((prev) => {
+      const next = { ...prev }
+      menuTree.forEach((item) => {
+        if (item.children && item.children.length > 0) {
+          if (!(item.id.toString() in next)) {
+            next[item.id.toString()] = item.children.some((child) =>
+              pathname.startsWith(child.path || "")
+            )
+          }
+        }
+      })
+      return next
+    })
+  }, [menuTree, pathname])
   const toggleMenu = (key: string) => {
     setMenuOpenState((prev) => ({
       ...prev,
@@ -248,7 +265,7 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
                                         className={cn(
                                           subMenuItemClass,
                                           pathname.startsWith(
-                                            subItem.path || ""
+                                            subItem.path
                                           ) &&
                                             "bg-sidebar-accent text-sidebar-accent-foreground"
                                         )}

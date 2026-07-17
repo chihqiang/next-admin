@@ -9,7 +9,9 @@ import { Toaster } from "sonner"
 import { getPageTitle } from "@/lib/nav"
 
 // 开发环境启动 MSW 模拟服务（仅在浏览器端执行）
-import "@/mocks"
+if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
+  import("@/mocks")
+}
 
 /**
  * 页面标题管理器

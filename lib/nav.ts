@@ -104,10 +104,14 @@ export function getPageTitle(pathname: string): string {
     typeof window !== "undefined"
       ? getAccountMenuPathTitleMap()
       : pathToTitleMap
-  return (
-    Object.entries(map)
-      .filter(([path]) => pathname.startsWith(path))
-      .sort((a, b) => b[0].length - a[0].length)
-      .at(0)?.[1] ?? "管理后台"
-  )
+
+  let bestMatch = ""
+  let bestTitle = "管理后台"
+  for (const [path, title] of Object.entries(map)) {
+    if (pathname.startsWith(path) && path.length > bestMatch.length) {
+      bestMatch = path
+      bestTitle = title
+    }
+  }
+  return bestTitle
 }

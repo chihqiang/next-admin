@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw"
-import { roles } from "@/mocks/handlers/data"
+import { roles, menus } from "@/mocks/handlers/data"
 
 export const roleHandlers = [
   http.get("/api/v1/sys/roles", ({ request }) => {
@@ -42,12 +42,13 @@ export const roleHandlers = [
 
     const role = roles.find((r) => r.id === roleId)
     if (role) {
+      const assignedMenus = menus.filter((m) => menu_ids.includes(m.id))
       return HttpResponse.json({
         code: 0,
         msg: "授权成功",
         data: {
           ...role,
-          menus: menu_ids,
+          menus: assignedMenus.map((m) => ({ id: m.id, pid: m.pid, name: m.name, remark: m.remark })),
         },
       })
     } else {

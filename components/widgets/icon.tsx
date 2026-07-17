@@ -1,23 +1,263 @@
-import * as icons from "lucide-react"
+"use client"
+
+import {
+  Home,
+  User,
+  Settings,
+  Users,
+  Shield,
+  ShieldUser,
+  Menu,
+  FileText,
+  LayoutDashboard,
+  UserCog,
+  ScrollText,
+  Activity,
+  ChevronDown,
+  ChevronRight,
+  Search,
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
+  Check,
+  X,
+  LogOut,
+  Moon,
+  Sun,
+  Bell,
+  Mail,
+  Lock,
+  Unlock,
+  Key,
+  RefreshCw,
+  Download,
+  Upload,
+  MoreHorizontal,
+  ArrowLeft,
+  ArrowRight,
+  Calendar,
+  Clock,
+  MapPin,
+  Phone,
+  Globe,
+  Database,
+  Server,
+  Cpu,
+  HardDrive,
+  Wifi,
+  WifiOff,
+  Zap,
+  AlertTriangle,
+  AlertCircle,
+  Info,
+  HelpCircle,
+  ExternalLink,
+  Copy,
+  Clipboard,
+  Save,
+  Filter,
+  SortAsc,
+  SortDesc,
+  Columns,
+  LayoutGrid,
+  List,
+  Table,
+  Image,
+  File,
+  Folder,
+  FolderOpen,
+  Archive,
+  Inbox,
+  Send,
+  MessageSquare,
+  MessageCircle,
+  Hash,
+  AtSign,
+  Percent,
+  DollarSign,
+  CreditCard,
+  ShoppingCart,
+  ShoppingBag,
+  Package,
+  Truck,
+  Map,
+  Navigation,
+  Compass,
+  Flag,
+  Bookmark,
+  Tag,
+  Layers,
+  Box,
+  Triangle,
+  Circle,
+  Square,
+  Hexagon,
+  Octagon,
+  Star,
+  Heart,
+  ThumbsUp,
+  ThumbsDown,
+  Hand,
+  Pointer,
+  Grip,
+  Move,
+  Maximize,
+  Minimize,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  RotateCw,
+  Power,
+  Plug,
+  Battery,
+  Terminal,
+  Code,
+  GitBranch,
+  GitCommit,
+  GitMerge,
+  GitPullRequest,
+  ExternalLinkIcon,
+} from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { Input } from "@/components/ui/input"
-import { ExternalLinkIcon } from "lucide-react"
+
+const iconMap: Record<string, LucideIcon> = {
+  Home,
+  User,
+  Settings,
+  Users,
+  Shield,
+  ShieldUser,
+  Menu,
+  FileText,
+  LayoutDashboard,
+  UserCog,
+  ScrollText,
+  Activity,
+  ChevronDown,
+  ChevronRight,
+  Search,
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
+  Check,
+  X,
+  LogOut,
+  Moon,
+  Sun,
+  Bell,
+  Mail,
+  Lock,
+  Unlock,
+  Key,
+  RefreshCw,
+  Download,
+  Upload,
+  MoreHorizontal,
+  ArrowLeft,
+  ArrowRight,
+  Calendar,
+  Clock,
+  MapPin,
+  Phone,
+  Globe,
+  Database,
+  Server,
+  Cpu,
+  HardDrive,
+  Wifi,
+  WifiOff,
+  Zap,
+  AlertTriangle,
+  AlertCircle,
+  Info,
+  HelpCircle,
+  ExternalLink,
+  Copy,
+  Clipboard,
+  Save,
+  Filter,
+  SortAsc,
+  SortDesc,
+  Columns,
+  LayoutGrid,
+  List,
+  Table,
+  Image,
+  File,
+  Folder,
+  FolderOpen,
+  Archive,
+  Inbox,
+  Send,
+  MessageSquare,
+  MessageCircle,
+  Hash,
+  AtSign,
+  Percent,
+  DollarSign,
+  CreditCard,
+  ShoppingCart,
+  ShoppingBag,
+  Package,
+  Truck,
+  Map,
+  Navigation,
+  Compass,
+  Flag,
+  Bookmark,
+  Tag,
+  Layers,
+  Box,
+  Triangle,
+  Circle,
+  Square,
+  Hexagon,
+  Octagon,
+  Star,
+  Heart,
+  ThumbsUp,
+  ThumbsDown,
+  Hand,
+  Pointer,
+  Grip,
+  Move,
+  Maximize,
+  Minimize,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  RotateCw,
+  Power,
+  Plug,
+  Battery,
+  Terminal,
+  Code,
+  GitBranch,
+  GitCommit,
+  GitMerge,
+  GitPullRequest,
+}
 
 interface IconProps {
   name: string
   className?: string
 }
 
-// ==========================================
-// 图标组件：直接用名字渲染
-// ==========================================
 export function Icon({ name, className = "h-4 w-4" }: IconProps) {
-  const IconComponent = icons[name as keyof typeof icons] as
-    | LucideIcon
-    | undefined
-  if (!IconComponent) return null
+  const IconComponent = iconMap[name]
+  if (!IconComponent) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn(`[Icon] 未找到图标: "${name}"，可用图标: ${Object.keys(iconMap).join(", ")}`)
+    }
+    return null
+  }
   return <IconComponent className={className} />
 }
 
@@ -26,20 +266,14 @@ interface IconSelectorProps {
   onChange: (value: string) => void
 }
 
-// ==========================================
-// 图标选择器：输入框 + 图标预览
-// ==========================================
 export function IconSelector({ value, onChange }: IconSelectorProps) {
   const [showHelp, setShowHelp] = useState(false)
   const helpRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLSpanElement>(null)
   const isEmpty = !value
 
-  const IconComponent = value
-    ? (icons[value as keyof typeof icons] as LucideIcon | undefined)
-    : undefined
+  const IconComponent = value ? iconMap[value] : undefined
 
-  // 点击外部关闭
   useEffect(() => {
     if (!showHelp) return
 

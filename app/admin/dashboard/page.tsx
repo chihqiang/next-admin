@@ -1,13 +1,9 @@
 "use client"
 
-import { memo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
-/**
- * 统计卡片组件 - 使用 React.memo 优化避免不必要的重渲染
- */
-const StatCard = memo(function StatCard({
+function StatCard({
   title,
   value,
   trend,
@@ -37,12 +33,9 @@ const StatCard = memo(function StatCard({
       </CardContent>
     </Card>
   )
-})
+}
 
-/**
- * 活动项组件 - 使用 React.memo 优化
- */
-const ActivityItem = memo(function ActivityItem({
+function ActivityItem({
   avatarLetter,
   avatarColor,
   title,
@@ -76,12 +69,9 @@ const ActivityItem = memo(function ActivityItem({
       </div>
     </div>
   )
-})
+}
 
-/**
- * 最近活动组件 - 使用 React.memo 优化
- */
-const RecentActivity = memo(function RecentActivity() {
+function RecentActivity() {
   const activities = [
     {
       avatarLetter: "U",
@@ -117,7 +107,7 @@ const RecentActivity = memo(function RecentActivity() {
       </CardContent>
     </Card>
   )
-})
+}
 
 export default function DashboardPage() {
   const stats = [

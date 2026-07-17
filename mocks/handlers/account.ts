@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw"
-import { accounts, menus } from "@/mocks/handlers/data"
+import { accounts, menus, roles } from "@/mocks/handlers/data"
 
 export const accountHandlers = [
   http.post("/api/v1/auth/login", async ({ request }) => {
@@ -101,16 +101,20 @@ export const accountHandlers = [
       status: boolean
     }
 
+    const fullRoles = account.roles.map((r) => roles.find((fr) => fr.id === r.id)).filter(Boolean) as typeof roles
+    const newAccount = {
+      id: Math.floor(Math.random() * 10000),
+      name: account.name,
+      email: account.email,
+      roles: fullRoles,
+      status: account.status,
+    }
+    accounts.push(newAccount)
+
     return HttpResponse.json({
       code: 0,
       msg: "创建成功",
-      data: {
-        id: Math.floor(Math.random() * 10000),
-        name: account.name,
-        email: account.email,
-        roles: account.roles,
-        status: account.status,
-      },
+      data: newAccount,
     })
   }),
 
@@ -126,32 +130,31 @@ export const accountHandlers = [
       status: boolean
     }
 
+    const index = accounts.findIndex((a) => a.id === id)
+    if (index !== -1) {
+      const fullRoles = account.roles.map((r) => roles.find((fr) => fr.id === r.id)).filter(Boolean) as typeof roles
+      accounts[index] = { ...accounts[index], ...account, id, roles: fullRoles }
+    }
+
     return HttpResponse.json({
       code: 0,
       msg: "更新成功",
-      data: {
-        id,
-        name: account.name,
-        email: account.email,
-        roles: account.roles,
-        status: account.status,
-      },
+      data: accounts[index] || { ...account, id },
     })
   }),
 
   http.delete("/api/v1/sys/accounts/:id", ({ params }) => {
     const id = Number(params.id)
+    const index = accounts.findIndex((a) => a.id === id)
+    const deleted = index !== -1 ? accounts[index] : null
+    if (index !== -1) {
+      accounts.splice(index, 1)
+    }
 
     return HttpResponse.json({
       code: 0,
       msg: "删除成功",
-      data: {
-        id,
-        name: `user_${id}`,
-        email: `user_${id}@example.com`,
-        roles: [{ id: 1, name: "admin" }],
-        status: true,
-      },
+      data: deleted || { id, name: `user_${id}`, email: `user_${id}@example.com`, roles: [], status: true },
     })
   }),
 ]

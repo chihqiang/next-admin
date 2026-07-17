@@ -18,7 +18,6 @@ export interface AuthToken {
 export interface AuthEventData {
   message?: string
   timestamp?: number
-  [key: string]: any
 }
 
 /**

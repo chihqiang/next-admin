@@ -89,23 +89,27 @@ class EventBus {
     // 收集所有的Promise，以便处理异步回调
     const promises: Promise<void>[] = []
 
-    set.forEach((entry) => {
+    // 快照遍历，防止回调中注册新监听器导致重入
+    const entries = [...set]
+    const toDelete: ListenerEntry[] = []
+
+    for (const entry of entries) {
       try {
         const result = entry.callback(data)
 
-        // 如果回调返回Promise，收集它
         if (result instanceof Promise) {
-          promises.push(result)
+          promises.push(result.catch(() => {}))
         }
 
-        // 如果是单次监听，监听完成后删除
         if (entry.once) {
-          set.delete(entry)
+          toDelete.push(entry)
         }
       } catch (error) {
         console.error(`Error in event listener for "${eventName}":`, error)
       }
-    })
+    }
+
+    toDelete.forEach((entry) => set.delete(entry))
 
     // 等待所有异步回调完成
     if (promises.length > 0) {

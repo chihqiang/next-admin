@@ -33,7 +33,7 @@ interface TreeCheckboxItemProps {
   onToggleCollapse: (nodeId: number) => void
 }
 
-const descendantIdsCache = new WeakMap<TreeSelectNode, number[]>()
+let descendantIdsCache = new WeakMap<TreeSelectNode, number[]>()
 
 /**
  * 获取指定节点的所有后代节点ID列表
@@ -187,7 +187,9 @@ function TreeCheckboxItem({
     const selectedCount = descendantIds.filter((id) =>
       selectedSet.has(id)
     ).length
-    return selectedCount > 0 && selectedCount < descendantIds.length
+    if (selectedCount === 0) return false
+    if (selectedCount === descendantIds.length) return false
+    return true
   }, [descendantIds, selectedSet, node.children])
 
   return (
@@ -254,6 +256,11 @@ function TreeCheckbox({
 }: TreeCheckboxProps) {
   const [searchValue, setSearchValue] = useState("")
   const [collapsedIds, setCollapsedIds] = useState<Set<number>>(new Set())
+
+  // 数据变化时清空缓存
+  useMemo(() => {
+    descendantIdsCache = new WeakMap<TreeSelectNode, number[]>()
+  }, [data])
 
   const filteredData = useMemo(
     () => (searchable ? filterTree(data, searchValue) : data),

@@ -7,8 +7,8 @@
 export const getAvatarInitials = (name?: string | null): string => {
   if (!name || !name.trim()) return "UN"
   const trimmed = name.trim()
-  // 英文姓名：取前两部分首字母
-  if (/^[a-zA-Z\s]+$/.test(trimmed)) {
+  // 英文/拉丁姓名：取前两部分首字母（支持重音字符）
+  if (/^[\p{L}\s]+$/u.test(trimmed)) {
     const parts = trimmed.split(/\s+/).filter(Boolean)
     if (parts.length >= 2) {
       return (parts[0][0] + parts[1][0]).toUpperCase()

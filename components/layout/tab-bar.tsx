@@ -87,6 +87,12 @@ function TabBarItem({
                   e.stopPropagation()
                   onClose()
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.stopPropagation()
+                    onClose()
+                  }
+                }}
                 className="ml-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted-foreground/20"
                 aria-label="关闭标签"
               >

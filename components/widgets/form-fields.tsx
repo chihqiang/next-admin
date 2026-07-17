@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Select,
   SelectContent,
@@ -83,15 +85,15 @@ function LSingleSelect({
   const denormalizeValue = (val: string): string | number | undefined => {
     if (val === "") return undefined
     const option = options.find((opt) => String(opt.value) === val)
-    return option ? option.value : val
+    return option?.value
   }
   const singleValue =
     typeof value === "string" || typeof value === "number" ? value : undefined
+  const selectedOption = options.find(
+    (opt) => String(opt.value) === String(singleValue)
+  )
 
   if (searchable) {
-    const selectedOption = options.find(
-      (opt) => String(opt.value) === String(singleValue)
-    )
     return (
       <div className={cn("space-y-2", className)}>
         <Label htmlFor={id}>{label}</Label>
@@ -178,16 +180,7 @@ function LSingleSelect({
         <SelectTrigger id={id}>
           <SelectValue
             placeholder={placeholder}
-            {...(options.find(
-              (opt) => normalizeValue(opt.value) === normalizeValue(singleValue)
-            )
-              ? {
-                  children: options.find(
-                    (opt) =>
-                      normalizeValue(opt.value) === normalizeValue(singleValue)
-                  )?.label,
-                }
-              : {})}
+            {...(selectedOption ? { children: selectedOption.label } : {})}
           />
         </SelectTrigger>
         <SelectContent>
@@ -350,25 +343,27 @@ interface LCheckboxProps {
  * 适用场景：启用状态、是否默认、是否显示、同意协议等
  */
 export function LCheckbox({
-  id = "checkbox",
+  id,
   label,
   checked,
   onChange,
   disabled,
   className,
 }: LCheckboxProps) {
+  const defaultId = React.useId()
+  const checkboxId = id || defaultId
   return (
     <div className={cn("flex items-center space-x-2", className)}>
       {/* 复选框核心组件 */}
       <Checkbox
-        id={id}
+        id={checkboxId}
         disabled={disabled}
         checked={checked}
         onCheckedChange={(value) => onChange(!!value)}
       />
 
       {/* 关联的标签文字 */}
-      <Label htmlFor={id} className="cursor-pointer">
+      <Label htmlFor={checkboxId} className="cursor-pointer">
         {label}
       </Label>
     </div>
