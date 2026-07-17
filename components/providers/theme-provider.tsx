@@ -37,7 +37,10 @@ function isTypingTarget(target: EventTarget | null) {
 function ThemeHotkey() {
   const { resolvedTheme, setTheme } = useTheme()
   const resolvedThemeRef = React.useRef(resolvedTheme)
-  resolvedThemeRef.current = resolvedTheme
+
+  React.useEffect(() => {
+    resolvedThemeRef.current = resolvedTheme
+  }, [resolvedTheme])
 
   React.useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {

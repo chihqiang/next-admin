@@ -76,43 +76,28 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
   const { searchKeyword, setSearchKeyword, searchResults, isSearching } =
     useMenuSearch(menuTree)
 
-  // 初始化菜单展开状态
-  const [menuOpenState, setMenuOpenState] = useState<Record<string, boolean>>(
-    () => {
-      return menuTree.reduce(
-        (acc, item) => {
-          if (item.children && item.children.length > 0) {
-            acc[item.id.toString()] = item.children.some((child) =>
-              pathname.startsWith(child.path || "")
-            )
-          }
-          return acc
-        },
-        {} as Record<string, boolean>
-      )
-    }
-  )
+  // 用户手动切换的展开状态（仅记录显式操作）
+  const [userOpenOverrides, setUserOpenOverrides] = useState<
+    Record<string, boolean>
+  >({})
 
-  // 当菜单树变化时同步展开状态
-  useEffect(() => {
-    setMenuOpenState((prev) => {
-      const next = { ...prev }
-      menuTree.forEach((item) => {
-        if (item.children && item.children.length > 0) {
-          if (!(item.id.toString() in next)) {
-            next[item.id.toString()] = item.children.some((child) =>
-              pathname.startsWith(child.path || "")
-            )
-          }
-        }
-      })
-      return next
+  // 菜单展开状态：用户覆盖优先，否则根据 pathname 自动判断
+  const menuOpenState = useMemo(() => {
+    const autoState: Record<string, boolean> = {}
+    menuTree.forEach((item) => {
+      if (item.children && item.children.length > 0) {
+        autoState[item.id.toString()] = item.children.some((child) =>
+          pathname.startsWith(child.path || "")
+        )
+      }
     })
-  }, [menuTree, pathname])
+    return { ...autoState, ...userOpenOverrides }
+  }, [menuTree, pathname, userOpenOverrides])
+
   const toggleMenu = (key: string) => {
-    setMenuOpenState((prev) => ({
+    setUserOpenOverrides((prev) => ({
       ...prev,
-      [key]: !prev[key],
+      [key]: !menuOpenState[key],
     }))
   }
 
@@ -264,9 +249,7 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
                                         href={subItem.path}
                                         className={cn(
                                           subMenuItemClass,
-                                          pathname.startsWith(
-                                            subItem.path
-                                          ) &&
+                                          pathname.startsWith(subItem.path) &&
                                             "bg-sidebar-accent text-sidebar-accent-foreground"
                                         )}
                                       >

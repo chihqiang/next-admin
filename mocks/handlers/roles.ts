@@ -48,7 +48,12 @@ export const roleHandlers = [
         msg: "授权成功",
         data: {
           ...role,
-          menus: assignedMenus.map((m) => ({ id: m.id, pid: m.pid, name: m.name, remark: m.remark })),
+          menus: assignedMenus.map((m) => ({
+            id: m.id,
+            pid: m.pid,
+            name: m.name,
+            remark: m.remark,
+          })),
         },
       })
     } else {

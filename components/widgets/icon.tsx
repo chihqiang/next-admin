@@ -254,7 +254,9 @@ export function Icon({ name, className = "h-4 w-4" }: IconProps) {
   const IconComponent = iconMap[name]
   if (!IconComponent) {
     if (process.env.NODE_ENV === "development") {
-      console.warn(`[Icon] 未找到图标: "${name}"，可用图标: ${Object.keys(iconMap).join(", ")}`)
+      console.warn(
+        `[Icon] 未找到图标: "${name}"，可用图标: ${Object.keys(iconMap).join(", ")}`
+      )
     }
     return null
   }

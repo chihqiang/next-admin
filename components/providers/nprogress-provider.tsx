@@ -44,7 +44,13 @@ export function NProgressProvider() {
       const anchor = (e.target as HTMLElement).closest("a")
       if (!anchor) return
       const href = anchor.getAttribute("href")
-      if (!href || href.startsWith("http") || href.startsWith("#") || anchor.target === "_blank") return
+      if (
+        !href ||
+        href.startsWith("http") ||
+        href.startsWith("#") ||
+        anchor.target === "_blank"
+      )
+        return
       if (isLoadingRef.current) return
       handleStart()
     }

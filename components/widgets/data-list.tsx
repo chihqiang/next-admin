@@ -405,7 +405,7 @@ export function DataList<T>({
                 !isEmpty &&
                 data.map((row) => {
                   const key = keyExtractor(row)
-    const isSelected = effectiveSelectedRowKeys.has(key)
+                  const isSelected = effectiveSelectedRowKeys.has(key)
                   return (
                     <TableRow
                       key={key}

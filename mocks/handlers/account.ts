@@ -101,7 +101,9 @@ export const accountHandlers = [
       status: boolean
     }
 
-    const fullRoles = account.roles.map((r) => roles.find((fr) => fr.id === r.id)).filter(Boolean) as typeof roles
+    const fullRoles = account.roles
+      .map((r) => roles.find((fr) => fr.id === r.id))
+      .filter(Boolean) as typeof roles
     const newAccount = {
       id: Math.floor(Math.random() * 10000),
       name: account.name,
@@ -132,7 +134,9 @@ export const accountHandlers = [
 
     const index = accounts.findIndex((a) => a.id === id)
     if (index !== -1) {
-      const fullRoles = account.roles.map((r) => roles.find((fr) => fr.id === r.id)).filter(Boolean) as typeof roles
+      const fullRoles = account.roles
+        .map((r) => roles.find((fr) => fr.id === r.id))
+        .filter(Boolean) as typeof roles
       accounts[index] = { ...accounts[index], ...account, id, roles: fullRoles }
     }
 
@@ -154,7 +158,13 @@ export const accountHandlers = [
     return HttpResponse.json({
       code: 0,
       msg: "删除成功",
-      data: deleted || { id, name: `user_${id}`, email: `user_${id}@example.com`, roles: [], status: true },
+      data: deleted || {
+        id,
+        name: `user_${id}`,
+        email: `user_${id}@example.com`,
+        roles: [],
+        status: true,
+      },
     })
   }),
 ]

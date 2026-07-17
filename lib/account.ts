@@ -24,9 +24,7 @@ export const getAccount = (): AuthAccount | null => {
 }
 
 export const hasMenuPath = (path: string): boolean => {
-  return Boolean(
-    getAccount()?.menus?.find((item: Menu) => item.path === path)
-  )
+  return Boolean(getAccount()?.menus?.find((item: Menu) => item.path === path))
 }
 
 function matchApiUrl(pattern: string, url: string): boolean {

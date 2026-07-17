@@ -284,11 +284,7 @@ export function CrudFormDialog<FormData>({
           <Button variant="outline" onClick={onClose} disabled={loading}>
             取消
           </Button>
-          <Button
-            type="submit"
-            form="crud-form"
-            disabled={loading}
-          >
+          <Button type="submit" form="crud-form" disabled={loading}>
             {loading && (
               <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
             )}
