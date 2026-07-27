@@ -71,6 +71,9 @@ export default function AccountPage() {
       searchFields={searchFields}
       deleteApi={accountDeleteApi}
       batchDelete
+      createPermission="/api/v1/sys/accounts"
+      updatePermission="/api/v1/sys/accounts/*"
+      deletePermission="/api/v1/sys/accounts/*"
       formComponent={AccountForm}
       defaultFormData={defaultFormData}
       createApi={accountCreateApi}

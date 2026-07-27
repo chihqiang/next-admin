@@ -64,6 +64,23 @@ export const hasMenuApiUrl = (url: string): boolean => {
     )
   )
 }
+
+/**
+ * 检查当前用户是否拥有指定 API 的访问权限（方法 + URL 联合检查）
+ * @param method HTTP 方法（GET / POST / PUT / DELETE），传 "*" 忽略方法检查
+ * @param url API 路径，如 "/api/v1/sys/accounts"
+ * @returns 是否有权限
+ */
+export const hasMenuApiPermission = (method: string, url: string): boolean => {
+  return Boolean(
+    getAccount()?.menus?.find((item: Menu) => {
+      if (!item.api_url) return false
+      if (item.api_method !== "*" && item.api_method !== method) return false
+      return matchApiUrl(item.api_url, url)
+    })
+  )
+}
+
 // 菜单树结构
 export interface AuthMenuTree extends Menu {
   children: AuthMenuTree[]

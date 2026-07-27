@@ -114,6 +114,9 @@ export default function RolesPage() {
         pageSize={8}
         searchFields={searchFields}
         deleteApi={roleDeleteApi}
+        createPermission="/api/v1/sys/roles"
+        updatePermission="/api/v1/sys/roles/*"
+        deletePermission="/api/v1/sys/roles/*"
         formComponent={RoleForm}
         defaultFormData={defaultFormData}
         createApi={roleCreateApi}

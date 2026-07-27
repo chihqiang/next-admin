@@ -33,6 +33,7 @@ import {
   RenderCard,
 } from "@/components/widgets/data-list"
 import type { PageResponse } from "@/lib/request"
+import { hasMenuApiPermission } from "@/lib/account"
 
 // ============================================================================
 // 类型定义
@@ -107,6 +108,13 @@ export interface CrudProps<T extends HasId, FormData = T> {
   dialogWidth?: string
   /** 弹窗最大高度 @default "85vh" */
   dialogHeight?: string
+
+  /** 新增按钮权限 API URL，不传则不校验 */
+  createPermission?: string
+  /** 编辑按钮权限 API URL，不传则不校验 */
+  updatePermission?: string
+  /** 删除按钮权限 API URL，不传则不校验 */
+  deletePermission?: string
 
   /** 自定义操作列（完全替换默认操作） */
   renderActions?: (item: T) => ReactNode
@@ -523,6 +531,9 @@ export function Crud<T extends HasId, FormData = T>(
     renderActions,
     extraActions,
     getItemName,
+    createPermission,
+    updatePermission,
+    deletePermission,
     dialogWidth,
     dialogHeight,
   } = props
@@ -747,7 +758,7 @@ export function Crud<T extends HasId, FormData = T>(
     (item: T) => (
       <div className="flex justify-end gap-1">
         {extraActions && extraActions(item)}
-        {FormComponent && updateApi && createApi && (
+        {FormComponent && updateApi && createApi && (!updatePermission || hasMenuApiPermission("PUT", updatePermission)) && (
           <Tooltip>
             <TooltipTrigger
               render={
@@ -767,7 +778,7 @@ export function Crud<T extends HasId, FormData = T>(
             <TooltipContent>编辑</TooltipContent>
           </Tooltip>
         )}
-        {deleteApi && (
+        {deleteApi && (!deletePermission || hasMenuApiPermission("DELETE", deletePermission)) && (
           <Tooltip>
             <TooltipTrigger
               render={
@@ -797,6 +808,8 @@ export function Crud<T extends HasId, FormData = T>(
       openEdit,
       openDelete,
       extraActions,
+      updatePermission,
+      deletePermission,
     ]
   )
 
@@ -882,13 +895,13 @@ export function Crud<T extends HasId, FormData = T>(
       {/* 操作栏 */}
       {(hasFormDialog || (selectable && batchDelete && deleteApi)) && (
         <div className="flex items-center gap-2 border-b px-4 py-2.5">
-          {hasFormDialog && (
+          {hasFormDialog && (!createPermission || hasMenuApiPermission("POST", createPermission)) && (
             <Button onClick={openAdd} size="sm">
               <Plus className="size-3.5" />
               新增{entityName}
             </Button>
           )}
-          {selectable && batchDelete && deleteApi && (
+          {selectable && batchDelete && deleteApi && (!deletePermission || hasMenuApiPermission("DELETE", deletePermission)) && (
             <Button
               variant="destructive"
               size="sm"

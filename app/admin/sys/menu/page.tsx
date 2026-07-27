@@ -87,6 +87,9 @@ export default function MenuPage() {
       pageSize={8}
       searchFields={searchFields}
       deleteApi={menuDeleteApi}
+      createPermission="/api/v1/sys/menus"
+      updatePermission="/api/v1/sys/menus/*"
+      deletePermission="/api/v1/sys/menus/*"
       formComponent={MenuForm}
       defaultFormData={defaultFormData}
       createApi={menuCreateApi}
